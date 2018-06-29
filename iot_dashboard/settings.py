@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+import mongoengine
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -76,10 +77,20 @@ WSGI_APPLICATION = 'iot_dashboard.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': '',
     }
 }
+
+# Connect to MongoDB
+_MONGODB_USER = 'admin'
+_MONGODB_PASSWD = 'admin123'
+_MONGODB_HOST = 'ds121251.mlab.com:21251'
+_MONGODB_NAME = 'iot-dashboard'
+_MONGODB_DATABASE_HOST = \
+    'mongodb://%s:%s@%s/%s' \
+    % (_MONGODB_USER, _MONGODB_PASSWD, _MONGODB_HOST, _MONGODB_NAME)
+
+mongoengine.connect(_MONGODB_NAME, host=_MONGODB_DATABASE_HOST)
 
 
 # Password validation
