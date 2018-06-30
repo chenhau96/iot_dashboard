@@ -77,7 +77,7 @@ WSGI_APPLICATION = 'iot_dashboard.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': '',
+        'ENGINE': 'django.db.backends.sqlite3'
     }
 }
 
