@@ -10,4 +10,7 @@ urlpatterns = [
     # path('<string:chart_name>/', views.detail, name='detail')
     # Device Management Page
     # path('devices/', views.devices, name='devices'),
+
+    # api
+    path('api/get_devices', views.api_get_devices, name='api_get_devices')
 ]
