@@ -1,10 +1,8 @@
 from django.shortcuts import render
+from django.http import HttpResponse
+import json
 from django.urls import reverse
 from dashboard.models import Devices
-
-
-for device in Devices.objects.all():
-    print(device.device_id)
 
 
 def index(request):
@@ -40,3 +38,7 @@ def mapView(request):
 
 def device_table(request):
     return render(request, 'dashboard/tables.html')
+
+def api_get_devices(request):
+    devices = Devices.objects.all()
+    return HttpResponse(json.dumps(devices, default=lambda d: list(d)))

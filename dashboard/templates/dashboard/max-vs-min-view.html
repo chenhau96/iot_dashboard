@@ -18,9 +18,20 @@
   <link href="{% static 'dashboard/vendor/datatables/dataTables.bootstrap4.css' %}" rel="stylesheet">
   <!-- Custom styles for this template-->
   <link href="{% static 'dashboard/css/sb-admin.css' %}" rel="stylesheet">
-  
+
+  <!-- import D3.js -->
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+
+  <style>
+    .line-chart
+    {
+        border: 1px solid lightgray;
+    }
+  </style>
+
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script>
+  /*
   google.charts.load('current', {'packages':['corechart', 'controls']});
 	google.charts.setOnLoadCallback(drawTempChart);
 	
@@ -56,6 +67,78 @@
             });
           count++;
         }
+  */
+  var api = 'https://api.coindesk.com/v1/bpi/historical/close.json?start=2017-12-31&end=2018-04-01';
+  document.addEventListener("DOMContentLoaded", function(event) {
+   fetch(api)
+     .then(function(response) { return response.json(); })
+     .then(function(data) {
+         var parsedData = parseData(data)
+         drawChart(parsedData);
+     })
+  });
+
+  function parseData(data) {
+     var arr = [];
+     for (var i in data.bpi) {
+        arr.push(
+           {
+              date: new Date(i), //date
+              value: +data.bpi[i] //convert string to number
+           });
+     }
+     return arr;
+  }
+
+  function drawChart(data) {
+     var svgWidth = 600, svgHeight = 400;
+     var margin = { top: 20, right: 20, bottom: 30, left: 50 };
+     var width = svgWidth - margin.left - margin.right;
+     var height = svgHeight - margin.top - margin.bottom;
+
+     var svg = d3.select('svg')
+        .attr("width", svgWidth)
+        .attr("height", svgHeight);
+
+     var g = svg.append("g")
+        .attr("transform",
+        "translate(" + margin.left + "," + margin.top + ")"
+        );
+
+     var x = d3.scaleTime().rangeRound([0, width]);
+     var y = d3.scaleLinear().rangeRound([height, 0]);
+
+     var line = d3.line()
+         .x(function(d) { return x(d.date)})
+         .y(function(d) { return y(d.value)})
+         x.domain(d3.extent(data, function(d) { return d.date }));
+         y.domain(d3.extent(data, function(d) { return d.value }));
+
+     g.append("g")
+         .attr("transform", "translate(0," + height + ")")
+         .call(d3.axisBottom(x))
+         .select(".domain")
+         .remove();
+
+     g.append("g")
+         .call(d3.axisLeft(y))
+         .append("text")
+         .attr("fill", "#000")
+         .attr("transform", "rotate(-90)")
+         .attr("y", 6)
+         .attr("dy", "0.71em")
+         .attr("text-anchor", "end")
+         .text("Price ($)");
+
+     g.append("path")
+        .datum(data)
+        .attr("fill", "none")
+        .attr("stroke", "steelblue")
+        .attr("stroke-linejoin", "round")
+        .attr("stroke-linecap", "round")
+        .attr("stroke-width", 1.5)
+        .attr("d", line);
+  }
   </script>
 </head>
 
@@ -153,17 +236,43 @@
   </nav>
   <div class="content-wrapper" style="overflow: hidden">
     <div class="container-fluid">
+      <div style="padding: 0 0 20px 0;">
+        <span class="col-lg-3">Color: </span>
+        <select name="colors">
+          <option value="volvo">Red</option>
+          <option value="saab">Blue</option>
+          <option value="fiat">Green</option>
+          <option value="audi">Yellow</option>
+          <option value="audi">Orange</option>
+        </select>
+        <span class="col-lg-3">Chart Type: </span>
+        <select name="colors">
+          <option value="volvo">Bar Chart</option>
+          <option value="saab">Line Chart</option>
+          <option value="fiat">Pie Chart</option>
+          <option value="audi">Scatter Plot</option>
+          <option value="audi">Histogram</option>
+        </select>
+        <span class="col-lg-3">View by: </span>
+        <select name="colors">
+          <option value="audi">Hourly</option>
+          <option value="volvo">Daily</option>
+          <option value="saab">Weekly</option>
+          <option value="fiat">Monthly</option>
+        </select>
+      </div>
       <!-- Second row Example-->
 	  <div class="row">
 		  <div class="col-lg-8">
 			  <div class="card mb-3">
 				<div class="card-header">Max vs Min Temperature</div>
 				  <div id="chart-01" style="width:100%; height:100%"></div>
+                  <svg></svg>
 			  </div>
 		  </div>
-			</div>
-		</div>
       </div>
+    </div>
+  </div>
 	  
     <!-- Bootstrap core JavaScript-->
     <script src="{% static 'dashboard/vendor/jquery/jquery.min.js' %}"></script>
