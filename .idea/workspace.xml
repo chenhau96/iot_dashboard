@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="05496795-e2ce-41d0-a7e9-fe3aeb4ae138" name="Default" comment="">
+    <list default="true" id="05496795-e2ce-41d0-a7e9-fe3aeb4ae138" name="Default" comment="wrote test case for connecting database and query documents in devices collection.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dashboard/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dashboard/templates/dashboard/max-vs-min-view.html" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard/templates/dashboard/max-vs-min-view.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dashboard/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dashboard/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iot_dashboard/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/iot_dashboard/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iot_dashboard/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/iot_dashboard/urls.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -20,17 +19,35 @@
       <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/dashboard/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="437">
-              <caret line="19" selection-start-line="19" selection-end-line="19" />
+            <state relative-caret-position="276">
+              <caret line="12" column="57" lean-forward="true" selection-start-line="12" selection-start-column="57" selection-end-line="12" selection-end-column="57" />
+              <folding>
+                <element signature="e#0#25#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="tests.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/dashboard/tests.py">
+      <file leaf-file-name="settings.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/iot_dashboard/settings.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="598">
-              <caret line="31" column="21" selection-start-line="31" selection-start-column="21" selection-end-line="31" selection-end-column="21" />
+            <state relative-caret-position="1038">
+              <caret line="133" column="23" lean-forward="true" selection-start-line="133" selection-start-column="23" selection-end-line="133" selection-end-column="23" />
+              <folding>
+                <element signature="e#314#323#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="urls.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/iot_dashboard/urls.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="326">
+              <caret line="30" column="10" lean-forward="true" selection-start-line="30" selection-start-column="10" selection-end-line="30" selection-end-column="10" />
+              <folding>
+                <element signature="e#637#669#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -47,10 +64,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="max-vs-min-view.html" pinned="false" current-in-tab="true">
+      <file leaf-file-name="max-vs-min-view.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/dashboard/templates/dashboard/max-vs-min-view.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="897">
+            <state relative-caret-position="3082">
               <caret line="134" column="29" selection-start-line="134" selection-start-column="29" selection-end-line="134" selection-end-column="29" />
               <folding>
                 <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
@@ -82,7 +99,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/iot_dashboard/settings.py" />
         <option value="$PROJECT_DIR$/dashboard/tests.py" />
         <option value="$PROJECT_DIR$/dashboard/static/dashboard/scripts/importReact.js" />
         <option value="$PROJECT_DIR$/dashboard/static/dashboard/scripts/header.js" />
@@ -96,18 +112,20 @@
         <option value="$PROJECT_DIR$/dashboard/templates/dashboard/snowView.html" />
         <option value="$PROJECT_DIR$/dashboard/templates/dashboard/tables.html" />
         <option value="$PROJECT_DIR$/dashboard/templates/dashboard/api_get_devices.html" />
-        <option value="$PROJECT_DIR$/dashboard/models.py" />
         <option value="$PROJECT_DIR$/dashboard/urls.py" />
         <option value="$PROJECT_DIR$/dashboard/views.py" />
         <option value="$PROJECT_DIR$/dashboard/templates/dashboard/max-vs-min-view.html" />
+        <option value="$PROJECT_DIR$/iot_dashboard/settings.py" />
+        <option value="$PROJECT_DIR$/dashboard/models.py" />
+        <option value="$PROJECT_DIR$/iot_dashboard/urls.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="116" />
-    <option name="y" value="28" />
-    <option name="width" value="1115" />
-    <option name="height" value="686" />
+    <option name="x" value="129" />
+    <option name="y" value="32" />
+    <option name="width" value="1106" />
+    <option name="height" value="673" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="1" id="Add" />
@@ -117,7 +135,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -173,6 +190,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -298,10 +316,10 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="116" y="28" width="1115" height="686" extended-state="0" />
+    <frame x="129" y="32" width="1106" height="673" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24476796" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.246789" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32854578" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" weight="0.32874015" />
       <window_info anchor="bottom" id="Version Control" order="9" weight="0.32749563" />
@@ -472,13 +490,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/dashboard/templates/dashboard/api_get_devices.html" />
-    <entry file="file://$PROJECT_DIR$/iot_dashboard/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="23">
-          <caret line="6" column="47" lean-forward="true" selection-start-line="6" selection-start-column="47" selection-end-line="6" selection-end-column="47" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/dashboard/static/dashboard/scripts/importReact.js" />
     <entry file="file://$PROJECT_DIR$/package-lock.json" />
     <entry file="file://$PROJECT_DIR$/dashboard/static/dashboard/scripts/header.js" />
@@ -490,25 +501,22 @@
     <entry file="file://$PROJECT_DIR$/dashboard/templates/dashboard/snowView.html" />
     <entry file="file://$PROJECT_DIR$/dashboard/templates/dashboard/mapView.html" />
     <entry file="file://$PROJECT_DIR$/dashboard/templates/dashboard/precipitationView.html" />
-    <entry file="file://$PROJECT_DIR$/iot_dashboard/settings.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2047">
-          <caret line="90" column="30" selection-start-line="90" selection-start-column="30" selection-end-line="90" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/dashboard/templates/dashboard/api_get_devices.html" />
     <entry file="file://$PROJECT_DIR$/dashboard/tests.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="598">
+        <state relative-caret-position="293">
           <caret line="31" column="21" selection-start-line="31" selection-start-column="21" selection-end-line="31" selection-end-column="21" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dashboard/models.py">
+    <entry file="file://$PROJECT_DIR$/dashboard/templates/dashboard/max-vs-min-view.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="437">
-          <caret line="19" selection-start-line="19" selection-end-line="19" />
+        <state relative-caret-position="3082">
+          <caret line="134" column="29" selection-start-line="134" selection-start-column="29" selection-end-line="134" selection-end-column="29" />
+          <folding>
+            <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#0;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -529,13 +537,32 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dashboard/templates/dashboard/max-vs-min-view.html">
+    <entry file="file://$PROJECT_DIR$/iot_dashboard/settings.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="897">
-          <caret line="134" column="29" selection-start-line="134" selection-start-column="29" selection-end-line="134" selection-end-column="29" />
+        <state relative-caret-position="1038">
+          <caret line="133" column="23" lean-forward="true" selection-start-line="133" selection-start-column="23" selection-end-line="133" selection-end-column="23" />
           <folding>
-            <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+            <element signature="e#314#323#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dashboard/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="276">
+          <caret line="12" column="57" lean-forward="true" selection-start-line="12" selection-start-column="57" selection-end-line="12" selection-end-column="57" />
+          <folding>
+            <element signature="e#0#25#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/iot_dashboard/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="326">
+          <caret line="30" column="10" lean-forward="true" selection-start-line="30" selection-start-column="10" selection-end-line="30" selection-end-column="10" />
+          <folding>
+            <element signature="e#637#669#0" expanded="true" />
           </folding>
         </state>
       </provider>
