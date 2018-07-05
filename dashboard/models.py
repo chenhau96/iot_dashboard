@@ -1,16 +1,19 @@
 from mongoengine import *
 from rest_framework_mongoengine import serializers, viewsets
-
+from rest_framework.decorators import action
+from rest_framework_mongoengine.generics import *
+from rest_framework import filters
 
 class Devices(Document):
     """
     Devices Collection
-    It contains attirbutes:
+    It contains attributes:
     - device_id: The id of the device
     - created_on: The datetime of the data generated, where datetime is converted to Epoch time
     - data: The data generated
     """
     device_id = StringField(max_length=30, required=True)
+    timestamp = DateTimeField()
     created_on = DynamicField()     # In Epoch time
     data = DynamicField()
 
@@ -22,10 +25,32 @@ class DevicesSerializer(serializers.DocumentSerializer):
 
 
 class DevicesViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows devices to be viewed or edited.
+    """
     lookup_field = 'device_id'
     serializer_class = DevicesSerializer
+    my_filter_fields = ('device_id', 'timestamp')  # specify the fields on which to filter
+
+    def get_kwargs_for_filtering(self):
+        filtering_kwargs = {}
+        for field in self.my_filter_fields:  # iterate over the filter fields
+            # get the value of a field from request query parameter
+            field_value = self.request.query_params.get(field)
+            if field_value:
+                filtering_kwargs[field] = field_value
+        return filtering_kwargs
 
     def get_queryset(self):
-        return Devices.objects.all()
+        queryset = Devices.objects.all()
+
+        # get the fields with values for filtering
+        filtering_kwargs = self.get_kwargs_for_filtering()
+        if filtering_kwargs:
+            # filter the queryset based on 'filtering_kwargs'
+            queryset = Devices.objects.filter(**filtering_kwargs)
+        return queryset
+
+
 
 

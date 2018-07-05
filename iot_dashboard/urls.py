@@ -19,8 +19,8 @@ from django.conf.urls import url
 from rest_framework_mongoengine import routers
 from dashboard.models import DevicesViewSet
 
+# Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
-
 router.register(r'devices', DevicesViewSet, r'devices')
 
 urlpatterns = [
