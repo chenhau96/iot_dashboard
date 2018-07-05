@@ -10,7 +10,7 @@ class Devices(Document):
     It contains attributes:
     - device_id: The id of the device
     - created_on: The datetime of the data generated, where datetime is converted to Epoch time
-    - data: The data generated
+    - data: The data generated (E.g. temperature, moisture, light, etc)
     """
     device_id = StringField(max_length=30, required=True)
     timestamp = DateTimeField()
@@ -48,8 +48,13 @@ class DevicesViewSet(viewsets.ModelViewSet):
         filtering_kwargs = self.get_kwargs_for_filtering()
         if filtering_kwargs:
             # filter the queryset based on 'filtering_kwargs'
+            # E.g. http://localhost:8000/api/devices/?device_id=00-80-00-00-00-01-1e-d8
             queryset = Devices.objects.filter(**filtering_kwargs)
         return queryset
+
+    @action(detail=False)
+    def get_distinct(self):
+        return Devices.objects.all().fields(device_id=1, _id=0, data=1)
 
 
 
