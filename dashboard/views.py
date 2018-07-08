@@ -4,6 +4,9 @@ import json
 from django.urls import reverse
 from dashboard.models import Devices
 
+from rest_framework_mongoengine import viewsets
+from dashboard.serializers import DevicesSerializer
+
 
 def index(request):
     # TODO: index page
@@ -39,6 +42,31 @@ def mapView(request):
 def device_table(request):
     return render(request, 'dashboard/tables.html')
 
-def api_get_devices(request):
-    devices = Devices.objects.all()
-    return HttpResponse(json.dumps(devices, default=lambda d: list(d)))
+
+class DevicesViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows devices to be viewed or edited.
+    """
+    lookup_field = 'device_id'
+    serializer_class = DevicesSerializer
+    my_filter_fields = ('device_id', 'timestamp')  # specify the fields on which to filter
+
+    def get_kwargs_for_filtering(self):
+        filtering_kwargs = {}
+        for field in self.my_filter_fields:  # iterate over the filter fields
+            # get the value of a field from request query parameter
+            field_value = self.request.query_params.get(field)
+            if field_value:
+                filtering_kwargs[field] = field_value
+        return filtering_kwargs
+
+    def get_queryset(self):
+        queryset = Devices.objects.all()
+
+        # get the fields with values for filtering
+        filtering_kwargs = self.get_kwargs_for_filtering()
+        if filtering_kwargs:
+            # filter the queryset based on 'filtering_kwargs'
+            # E.g. http://localhost:8000/api/devices/?device_id=00-80-00-00-00-01-1e-d8
+            queryset = Devices.objects.filter(**filtering_kwargs)
+        return queryset

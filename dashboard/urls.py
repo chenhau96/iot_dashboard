@@ -19,7 +19,4 @@ urlpatterns = [
     path('mapView/', views.mapView, name='mapView'),
     path('device_table/', views.device_table, name='device_table'),
 
-    # api
-    path('api/get_devices', views.api_get_devices, name='api_get_devices'),
-
 ]
