@@ -19,8 +19,10 @@
   <link href="{% static 'dashboard/css/sb-admin.css' %}" rel="stylesheet">
 
   <!-- import D3.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js"></script>
   <script src="{% static 'dashboard/d3/d3.min.js' %}"></script>
   <script src="{% static 'dashboard/scripts/drawCharts.js' %}"></script>
+
 
   <style>
     .line-chart {
@@ -175,8 +177,8 @@
         <input id="threshold" type="number" name="threshold" class="threshold-text-box" min="0" max="100" value="30">
         <label for="colors">Color: </label>
         <select id="colors" name="colors" onchange="changeColor(event)">
-          <option value="red">Red</option>
-          <option value="blue">Blue</option>
+          <option value="blue" selected>Blue</option>
+            <option value="red">Red</option>
           <option value="green">Green</option>
           <option value="yellow">Yellow</option>
           <option value="orange">Orange</option>
