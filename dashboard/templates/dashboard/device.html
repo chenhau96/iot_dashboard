@@ -1,0 +1,11 @@
+{% extends "dashboard/header_nav.html" %}
+
+{% block content %}
+
+    <div>
+        {% for dev in device %}
+        <p>{{ dev.timestamp }}</p>
+        {% endfor %}
+    </div>
+
+{% endblock %}
