@@ -1,0 +1,21 @@
+{% extends "dashboard/header_nav.html" %}
+
+{% block content %}
+<div class="content-wrapper" style="overflow: hidden">
+    <div class="container-fluid">
+        <!-- Chart filtering/configuration -->
+        {% include "dashboard/includes/chart_config.html" %}
+
+        <!-- Chart -->
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card mb-3">
+                    <div class="card-header">Temperature</div>
+                    <svg></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
