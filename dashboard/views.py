@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.urls import reverse
 from django.http import Http404
+import json
+
 from dashboard.models import Devices
 
 from rest_framework_mongoengine import viewsets
@@ -25,16 +27,19 @@ def device(request, dev_id):
 
     # Get device_id from url parameter and perform query
     # to find the device_id
-    device = Devices.objects(device_id=dev_id)
+    devices = Devices.objects(device_id=dev_id)
 
-    if len(device) == 0:
+    if len(devices) == 0:
         # if device_id not found, raise Http404
         raise Http404("Device ID \"" + dev_id + "\" does not exist")
     else:
         # if device_id is found, render the page
         return render(request, 'dashboard/device.html',
-                      {'device': device})
-
+                      {
+                          'devices': devices,
+                          'device_id': dev_id,
+                          'data_count': len(devices[0].data),
+                      })
 
 def detail(request, dev_id, whichData):
     """

@@ -1,12 +1,15 @@
 {% extends "dashboard/_header_nav.html" %}
 
+{% load static %}
+
 {% block content %}
+<script src="{% static 'dashboard/scripts/displayCharts.js' %}"></script>
 
 <div class="content-wrapper">
     <div class="container-fluid">
-        {% for dev in device %}
-            <p>{{ dev.timestamp }}</p>
-        {% endfor %}
+        <div id="device-id" hidden>{{ device_id }}</div>
+
+        <div class="device-charts"></div>
     </div>
 </div>
 
