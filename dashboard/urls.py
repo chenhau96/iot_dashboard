@@ -6,8 +6,14 @@ app_name = 'dashboard'
 urlpatterns = [
     # Dashboard Page
     path('', views.index, name='index'),
+
+    # Individual Device Dashboard
+    # A device_id string parameter is required
+    path('<slug:dev_id>/', views.device, name='device'),
+
     # Single Chart Page
-    # path('<string:chart_name>/', views.detail, name='detail')
+    # path('<string:dev_id>/<string:whichData>/', views.detail, name='detail'),
+
     # Device Management Page
     # path('devices/', views.devices, name='devices'),
 

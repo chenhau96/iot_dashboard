@@ -9,7 +9,7 @@
   var api = 'http://localhost:8000/api/devices';
 
   document.addEventListener("DOMContentLoaded", function(event) {
-    color = document.getElementById("colors").value;
+    //color = document.getElementById("colors").value;
    fetch(api)
      .then(function(response) { return response.json(); })
      .then(function(data) {

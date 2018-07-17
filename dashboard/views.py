@@ -13,6 +13,15 @@ def index(request):
     # pass
     return render(request, 'dashboard/index.html')
 
+
+def device(request, dev_id):
+    # TODO: individual device dashboard page
+    device = Devices.objects(device_id=dev_id)
+
+    return render(request, 'dashboard/device.html',
+                  {'device': device})
+
+
 def detail(request, chart_name):
     # TODO: link to a single chart page when click on the chart name
     # return render(request, 'dashboard/.html')
@@ -61,7 +70,7 @@ class DevicesViewSet(viewsets.ModelViewSet):
         return filtering_kwargs
 
     def get_queryset(self):
-        queryset = Devices.objects.all()
+        queryset = Devices.objects.order_by('timestamp')
 
         # get the fields with values for filtering
         filtering_kwargs = self.get_kwargs_for_filtering()
