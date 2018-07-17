@@ -1,7 +1,6 @@
 from django.shortcuts import render
-from django.http import HttpResponse
-import json
 from django.urls import reverse
+from django.http import Http404
 from dashboard.models import Devices
 
 from rest_framework_mongoengine import viewsets
@@ -9,23 +8,43 @@ from dashboard.serializers import DevicesSerializer
 
 
 def index(request):
+    """
+    Main dashboard
+    """
     # TODO: index page
     # pass
     return render(request, 'dashboard/index.html')
 
 
 def device(request, dev_id):
+    """
+    Display each device dashboard page
+    All charts for individual device will be on this page.
+    """
     # TODO: individual device dashboard page
+
+    # Get device_id from url parameter and perform query
+    # to find the device_id
     device = Devices.objects(device_id=dev_id)
 
-    return render(request, 'dashboard/device.html',
-                  {'device': device})
+    if len(device) == 0:
+        # if device_id not found, raise Http404
+        raise Http404("Device ID \"" + dev_id + "\" does not exist")
+    else:
+        # if device_id is found, render the page
+        return render(request, 'dashboard/device.html',
+                      {'device': device})
 
 
-def detail(request, chart_name):
+def detail(request, dev_id, whichData):
+    """
+    Display individual chart of a device_id with
+    chart configuration/settings for personalization
+    """
     # TODO: link to a single chart page when click on the chart name
     # return render(request, 'dashboard/.html')
     pass
+
 
 def devices(request):
     # TODO: navigate to devices page

@@ -1,3 +1,4 @@
+from django.urls import reverse
 from django.test import TestCase
 from dashboard.models import Devices
 
@@ -33,4 +34,23 @@ class ConnectionTest(TestCase):
         self.assertEqual(db.name, 'iot-dashboard')
 
 
+class IndividualDeviceViewTests(TestCase):
+    def test_deviceID_notExists(self):
+        """
+        A device id that is not exist in the database should
+        return a 404 status code.
+        """
+        dev_id = "123456"
+        url = reverse('dashboard:device', kwargs={'dev_id':dev_id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
 
+    def test_deviceID_exists(self):
+        """
+        A device id that is exist in the database should return
+        a 200 status code and display the device dashboard page.
+        """
+        dev_id = "00-80-00-00-00-01-1e-d7"
+        url = reverse('dashboard:device', kwargs={'dev_id':dev_id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)

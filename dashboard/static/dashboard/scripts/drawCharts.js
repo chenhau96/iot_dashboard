@@ -1,6 +1,4 @@
 
-
-  //var api = 'https://api.coindesk.com/v1/bpi/historical/close.json?start=2017-12-31&end=2018-04-01';
   var color;
   var parsedData;
   var ttFormatTime = d3.timeFormat("%d-%m-%Y %X");
@@ -9,7 +7,7 @@
   var api = 'http://localhost:8000/api/devices';
 
   document.addEventListener("DOMContentLoaded", function(event) {
-    //color = document.getElementById("colors").value;
+    color = document.getElementById("colors").value;
    fetch(api)
      .then(function(response) { return response.json(); })
      .then(function(data) {
@@ -37,7 +35,6 @@
   }
 
   function drawLineChart(data) {
-    console.log(data[0].ts);
 
      var svgWidth = 650, svgHeight = 400;
      var margin = { top: 20, right: 20, bottom: 50, left: 80 };

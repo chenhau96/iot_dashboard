@@ -1,11 +1,13 @@
-{% extends "dashboard/header_nav.html" %}
+{% extends "dashboard/_header_nav.html" %}
 
 {% block content %}
 
-    <div>
+<div class="content-wrapper">
+    <div class="container-fluid">
         {% for dev in device %}
-        <p>{{ dev.timestamp }}</p>
+            <p>{{ dev.timestamp }}</p>
         {% endfor %}
     </div>
+</div>
 
 {% endblock %}

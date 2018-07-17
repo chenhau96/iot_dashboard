@@ -4,16 +4,18 @@ from . import views
 
 app_name = 'dashboard'
 urlpatterns = [
-    # Dashboard Page
+    # Dashboard Main Page
     path('', views.index, name='index'),
 
     # Individual Device Dashboard
     # A device_id string parameter is required
-    path('<slug:dev_id>/', views.device, name='device'),
+    path('device/<slug:dev_id>/', views.device, name='device'),
 
+    # TODO:
     # Single Chart Page
-    # path('<string:dev_id>/<string:whichData>/', views.detail, name='detail'),
+    # path('device/<slug:dev_id>/<slug:whichData>/', views.detail, name='detail'),
 
+    # TODO:
     # Device Management Page
     # path('devices/', views.devices, name='devices'),
 

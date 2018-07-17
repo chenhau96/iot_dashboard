@@ -1,6 +1,10 @@
-{% extends "dashboard/header_nav.html" %}
+{% extends "dashboard/_header_nav.html" %}
+
+{% load static %}
 
 {% block content %}
+<script src="{% static 'dashboard/scripts/drawCharts.js' %}"></script>
+
 <div class="content-wrapper" style="overflow: hidden">
     <div class="container-fluid">
         <!-- Chart filtering/configuration -->
