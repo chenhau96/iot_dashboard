@@ -8,7 +8,7 @@ urlpatterns = [
     path('', views.index, name='index'),
 
     # Individual Device Dashboard
-    # A device_id string parameter is required
+    # Param: String dev_id
     path('device/<slug:dev_id>/', views.device, name='device'),
 
     # TODO:

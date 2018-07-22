@@ -3,12 +3,13 @@
 {% load static %}
 
 {% block content %}
-<script src="{% static 'dashboard/scripts/displayCharts.js' %}"></script>
+<script>
+    var device_id = "{{ device_id }}";
+</script>
+<script src="{% static 'dashboard/scripts/displaySingleDeviceCharts.js' %}"></script>
 
 <div class="content-wrapper">
     <div class="container-fluid">
-        <div id="device-id" hidden>{{ device_id }}</div>
-
         <div class="device-charts"></div>
     </div>
 </div>

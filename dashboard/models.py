@@ -11,7 +11,6 @@ class Devices(Document):
     """
     device_id = StringField(max_length=30, required=True)
     timestamp = DateTimeField()
-    created_on = DynamicField()     # In Epoch time
     data = DynamicField()
 
 

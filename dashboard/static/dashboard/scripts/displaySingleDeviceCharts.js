@@ -2,24 +2,30 @@
   var parsedData;
   var ttFormatTime = d3.timeFormat("%d-%m-%Y %X");
   var iconCels = "\u2103";
+  var interval = 5000;
 
   document.addEventListener("DOMContentLoaded", function(event) {
-    var device_id = document.getElementById("device-id").innerHTML;
-    console.log(device_id);
-    var api = 'http://localhost:8000/api/devices/?device_id=' + device_id
-    console.log(api);
+    var api = 'http://localhost:8000/api/devices/?device_id=' + device_id;
 
-   fetch(api)
+    // Set an interval to update the charts without reloading the page
+    setInterval(function() {
+            fetchDataFromAPI(api);
+        },
+        interval);
+  });
+
+  function fetchDataFromAPI(api) {
+    fetch(api)
      .then(function(response) { return response.json(); })
-     .then(function(data) {
+     .then(function(apiData) {
         //console.log(data[0].data);
-        for (var whichData in data[0].data) {
+        for (var whichData in apiData[0].data) {
             parsedData = parseData(data, whichData)
             drawLineChart(parsedData, whichData);
         }
 
      })
-  });
+  }
 
   function parseData(data, whichData) {
     var arr = [];
@@ -28,7 +34,6 @@
 
         arr.push(
            {
-                //ts: i,
                ts: datetime,
                temperature: data[i].data[whichData],
            }
@@ -114,6 +119,10 @@
         .attr("r", 4)
         .attr("cx", (d, i) => x(d.ts))
         .attr("cy", (d, i) => y(d.temperature));
+  }
+
+  function updateChart() {
+
   }
 
 
