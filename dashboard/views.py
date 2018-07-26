@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.urls import reverse
 from django.http import Http404
+from datetime import timedelta
+import datetime
 import json
 
 from dashboard.models import Devices
@@ -78,28 +80,53 @@ def device_table(request):
 
 class DevicesViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows devices to be viewed or edited.
+    API endpoint for devices data
     """
-    lookup_field = 'device_id'
     serializer_class = DevicesSerializer
-    my_filter_fields = ('device_id', 'timestamp')  # specify the fields on which to filter
-
-    def get_kwargs_for_filtering(self):
-        filtering_kwargs = {}
-        for field in self.my_filter_fields:  # iterate over the filter fields
-            # get the value of a field from request query parameter
-            field_value = self.request.query_params.get(field)
-            if field_value:
-                filtering_kwargs[field] = field_value
-        return filtering_kwargs
 
     def get_queryset(self):
+        # Get all device objects order by timestamp
         queryset = Devices.objects.order_by('timestamp')
 
-        # get the fields with values for filtering
-        filtering_kwargs = self.get_kwargs_for_filtering()
-        if filtering_kwargs:
-            # filter the queryset based on 'filtering_kwargs'
-            # E.g. http://localhost:8000/api/devices/?device_id=00-80-00-00-00-01-1e-d8
-            queryset = Devices.objects.filter(**filtering_kwargs)
+        # Get device_id or timestamp in API parameter
+        device_id = self.request.query_params.get('device_id', None)
+        timestamp = self.request.query_params.get('timestamp', None)
+
+        if device_id is not None:
+            """
+            Filter queryset if device_id present in API url parameter
+            E.g. http://localhost:8000/api/devices/?device_id=123456
+            """
+            queryset = queryset.filter(device_id=device_id)
+
+        if timestamp is not None:
+            """
+            Filter queryset if timestamp present in API url parameter
+            E.g. http://localhost:8000/api/devices/?timestamp=last7day
+            """
+
+            # Get today date
+            today = datetime.date.today()
+
+            # Check timestamp parameter value to do filter accordingly
+            if timestamp == 'today':
+                queryset = queryset.filter(timestamp__gte=today)
+            elif timestamp == 'last3day':
+                last3day = today - timedelta(days=3)
+                queryset = queryset.filter(timestamp__gte=last3day)
+            elif timestamp == 'last7day':
+                last7day = today - timedelta(days=7)
+                queryset = queryset.filter(timestamp__gte=last7day)
+            elif timestamp == 'thismonth':
+                thismonth = today - timedelta(days=30)
+                queryset = queryset.filter(timestamp__gte=thismonth)
+            elif timestamp == 'thisyear':
+                thisyear = today - timedelta(days=365)
+                queryset = queryset.filter(timestamp__gte=thisyear)
+
         return queryset
+
+
+
+
+

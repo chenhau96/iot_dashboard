@@ -8,10 +8,10 @@
     var api = 'http://localhost:8000/api/devices/?device_id=' + device_id;
 
     // Set an interval to update the charts without reloading the page
-    setInterval(function() {
+    //setInterval(function() {
             fetchDataFromAPI(api);
-        },
-        interval);
+     //   },
+     //   interval);
   });
 
   function fetchDataFromAPI(api) {
@@ -20,7 +20,7 @@
      .then(function(apiData) {
         //console.log(data[0].data);
         for (var whichData in apiData[0].data) {
-            parsedData = parseData(data, whichData)
+            parsedData = parseData(apiData, whichData)
             drawLineChart(parsedData, whichData);
         }
 

@@ -4,6 +4,7 @@ var parsedData;
 var ttFormatTime = d3.timeFormat("%d-%m-%Y %X");
 var iconCels = "\u2103";
 var updateFlag = false;
+var updateInterval = 30000; // 30 seconds
 
 // Chart width and height setting
 var svgWidth = 650, svgHeight = 400;
@@ -23,21 +24,23 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
   setInterval(function() {
     fetchDataFromAPI(api);
-  }, 5000);
+  }, updateInterval);
 });
 
 function fetchDataFromAPI(api) {
   fetch(api)
     .then(function(response) { return response.json(); })
-    .then(function(data) {
+    .then(function(apiData) {
       if (!updateFlag) {
+        // First display of chart
         updateFlag = true;
-        parsedData = parseData(data);
+        parsedData = parseData(apiData);
         console.log(parsedData);
         drawLineChart(parsedData);
       }
       else {
-        parsedData = parseData(data);
+        // After display the chart, update it every 5s
+        parsedData = parseData(apiData);
         console.log(parsedData);
         updateChart(parsedData);
       }
@@ -66,6 +69,7 @@ function drawLineChart(data) {
     .attr("height", svgHeight);
 
   var g = svg.append("g")
+    .attr("class", "chart")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
   // scale the range of x-axis
@@ -125,9 +129,13 @@ function drawLineChart(data) {
 
   g.selectAll("circle").data(data).enter()
     .append("circle")
+    .attr("class", "dotPoint")
     .attr("r", 4)
     .attr("cx", (d, i) => x(d.ts))
-    .attr("cy", (d, i) => y(d.temperature));
+    .attr("cy", (d, i) => y(d.temperature))
+    .attr("fill", (d) => {
+      return (d.temperature >= 30) ? "red" : "blue";
+    });
 }
 
 function changeColor(e) {
@@ -135,8 +143,28 @@ function changeColor(e) {
   d3.select(".line").attr("stroke", color);
 }
 
+function changeTimeline(e) {
+  var timeline = e.target.value;
+  if (timeline == "today") {
+    api = 'http://localhost:8000/api/devices/?timestamp=today';
+    fetchDataFromAPI(api);
+  }
+  else if (timeline == "last7Days") {
+    api = 'http://localhost:8000/api/devices/?timestamp=last7day';
+    fetchDataFromAPI(api);
+  }
+  else if (timeline == "thisMonth") {
+    api = 'http://localhost:8000/api/devices/?timestamp=thismonth';
+    fetchDataFromAPI(api);
+  }
+  else if (timeline == "thisYear") {
+    api = 'http://localhost:8000/api/devices/?timestamp=thisyear';
+    fetchDataFromAPI(api);
+  }
+}
+
 function drawScatterPlot(data) {
-  var svgWidth = 600, svgHeight = 380;
+  /*var svgWidth = 600, svgHeight = 380;
   var margin = { top: 30, right: 30, bottom: 30, left: 30 };
   var width = svgWidth - margin.left - margin.right;
   var height = svgHeight - margin.top - margin.bottom;
@@ -154,7 +182,8 @@ function drawScatterPlot(data) {
   .attr("cy", (d, i) => height - d.temp)
   .attr("fill", (d) => {
   return d.temp > 25.0 ? "red" : "blue";
-  });
+  });*/
+
 }
 
 function updateChart(data) {
@@ -181,15 +210,37 @@ function updateChart(data) {
   var svg = d3.select("svg").transition();
 
   svg.select(".line")
-    .duration(750)
+    .duration(1000)  // length of animation in ms
     .attr("d", line);
 
   svg.select(".x-axis")
-    .duration(750)
+    .duration(1000)
     .call(xAxis);
 
   svg.select(".y-axis")
-    .duration(750)
+    .duration(1000)
     .call(yAxis);
+
+/*
+  // update all circles
+  d3.selectAll("circle")
+    .data(data)
+    .transition()
+    .duration(1000)
+    .attr("cx", (d, i) => x(d.ts))
+    .attr("cy", (d, i) => y(d.temperature));
+
+  d3.select("svg").selectAll("circle")
+    .data(data)
+    .enter()
+    .append("circle")
+    .attr("r", 3)
+    .attr("cx", (d, i) => x(d.ts))
+    .attr("cy", (d, i) => y(d.temperature));
+
+  d3.select("svg").selectAll("circle")
+    .data(data)
+    .exit()
+    .remove();*/
 }
 
