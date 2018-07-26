@@ -91,17 +91,22 @@ class DevicesViewSet(viewsets.ModelViewSet):
         # Get device_id or timestamp in API parameter
         device_id = self.request.query_params.get('device_id', None)
         timestamp = self.request.query_params.get('timestamp', None)
+        data = self.request.query_params.get('data', None)
 
         if device_id is not None:
             """
-            Filter queryset if device_id present in API url parameter
+            Filter queryset to retrieve a specific device_id
+            if 'device_id' param present in API url parameter
+            
             E.g. http://localhost:8000/api/devices/?device_id=123456
             """
             queryset = queryset.filter(device_id=device_id)
 
         if timestamp is not None:
             """
-            Filter queryset if timestamp present in API url parameter
+            Filter queryset to retrieve a range of timestamp
+            if 'timestamp' param present in API url parameter
+            
             E.g. http://localhost:8000/api/devices/?timestamp=last7day
             """
 
@@ -123,6 +128,24 @@ class DevicesViewSet(viewsets.ModelViewSet):
             elif timestamp == 'thisyear':
                 thisyear = today - timedelta(days=365)
                 queryset = queryset.filter(timestamp__gte=thisyear)
+
+        if data is not None:
+            """
+            Filter queryset to retrieve a specific datafield/columns
+            if 'data' param present in API url parameter
+            
+            E.g. http://localhost:8000/api/devices/?data=temperature
+            """
+
+            # Check if 'data' param is a valid datafield in the queryset
+            for datafield in queryset[0].data:
+                if datafield == data:
+                    # Return queryset if 'data' param is valid
+                    return queryset\
+                        .only('device_id', 'timestamp', 'data__'+data)
+
+            # Set queryset to none if 'data' param is invalid
+            queryset = None
 
         return queryset
 
