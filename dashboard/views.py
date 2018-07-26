@@ -80,7 +80,11 @@ def device_table(request):
 
 class DevicesViewSet(viewsets.ModelViewSet):
     """
-    API endpoint for devices data
+    API endpoint for devices data which supports filtering
+    to retrieve subset of the data
+
+    Example of API url with combined query param for filtering:
+    http://localhost:8000/api/devices/?device_id=00-80-00-00-00-01-1e-d8&data=temperature
     """
     serializer_class = DevicesSerializer
 
@@ -88,7 +92,7 @@ class DevicesViewSet(viewsets.ModelViewSet):
         # Get all device objects order by timestamp
         queryset = Devices.objects.order_by('timestamp')
 
-        # Get device_id or timestamp in API parameter
+        # Get device_id, timestamp, data in API parameter
         device_id = self.request.query_params.get('device_id', None)
         timestamp = self.request.query_params.get('timestamp', None)
         data = self.request.query_params.get('data', None)
@@ -98,7 +102,7 @@ class DevicesViewSet(viewsets.ModelViewSet):
             Filter queryset to retrieve a specific device_id
             if 'device_id' param present in API url parameter
             
-            E.g. http://localhost:8000/api/devices/?device_id=123456
+            E.g. http://localhost:8000/api/devices/?device_id=00-80-00-00-00-01-1e-d8
             """
             queryset = queryset.filter(device_id=device_id)
 
@@ -122,12 +126,12 @@ class DevicesViewSet(viewsets.ModelViewSet):
             elif timestamp == 'last7day':
                 last7day = today - timedelta(days=7)
                 queryset = queryset.filter(timestamp__gte=last7day)
-            elif timestamp == 'thismonth':
-                thismonth = today - timedelta(days=30)
-                queryset = queryset.filter(timestamp__gte=thismonth)
-            elif timestamp == 'thisyear':
-                thisyear = today - timedelta(days=365)
-                queryset = queryset.filter(timestamp__gte=thisyear)
+            elif timestamp == 'this-month':
+                this_month = today - timedelta(days=30)
+                queryset = queryset.filter(timestamp__gte=this_month)
+            elif timestamp == 'this-year':
+                this_year = today - timedelta(days=365)
+                queryset = queryset.filter(timestamp__gte=this_year)
 
         if data is not None:
             """

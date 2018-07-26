@@ -154,11 +154,11 @@ function changeTimeline(e) {
     fetchDataFromAPI(api);
   }
   else if (timeline == "thisMonth") {
-    api = 'http://localhost:8000/api/devices/?timestamp=thismonth';
+    api = 'http://localhost:8000/api/devices/?timestamp=this-month';
     fetchDataFromAPI(api);
   }
   else if (timeline == "thisYear") {
-    api = 'http://localhost:8000/api/devices/?timestamp=thisyear';
+    api = 'http://localhost:8000/api/devices/?timestamp=this-year';
     fetchDataFromAPI(api);
   }
 }
