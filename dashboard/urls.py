@@ -11,13 +11,13 @@ urlpatterns = [
     # Param: String dev_id
     path('device/<slug:dev_id>/', views.device, name='device'),
 
-    # TODO:
     # Single Chart Page
-    # path('device/<slug:dev_id>/<slug:whichData>/', views.detail, name='detail'),
+    path('device/<slug:dev_id>/<slug:whichData>/',
+         views.chart_detail, name='chart_detail'),
 
     # TODO:
     # Device Management Page
-    # path('devices/', views.devices, name='devices'),
+    path('devices/management', views.devices_management, name='devices_management'),
 
     # For temporary use
     path('max_vs_min_view/', views.max_vs_min_view, name='max_vs_min_view'),

@@ -2,7 +2,7 @@
 var color;
 var parsedData;
 var ttFormatTime = d3.timeFormat("%d-%m-%Y %X");
-var iconCels = "\u2103";
+var iconCels = "\u2103";  // Celsius icon
 var updateFlag = false;
 var updateInterval = 30000; // 30 seconds
 
@@ -15,13 +15,15 @@ var width_mid = width / 2;
 var height_mid = height / 2;
 
 // API URL
-var api = 'http://localhost:8000/api/devices';
-
+var api = 'http://localhost:8000/api/devices/?device_id=' + device_id +
+          '&data=' + whichData;
+console.log(api);
 // After everything is loaded
 document.addEventListener("DOMContentLoaded", function(event) {
   color = document.getElementById("colors").value;
   fetchDataFromAPI(api);
 
+  // Update the charts based on updateInterval value
   setInterval(function() {
     fetchDataFromAPI(api);
   }, updateInterval);
@@ -35,27 +37,27 @@ function fetchDataFromAPI(api) {
         // First display of chart
         updateFlag = true;
         parsedData = parseData(apiData);
-        console.log(parsedData);
+        //console.log(parsedData);
         drawLineChart(parsedData);
       }
       else {
         // After display the chart, update it every 5s
         parsedData = parseData(apiData);
-        console.log(parsedData);
+        //console.log(parsedData);
         updateChart(parsedData);
       }
     })
 }
 
-function parseData(data) {
+function parseData(apiData) {
   var arr = [];
-  for (var i in data) {
-    var datetime = new Date(data[i].timestamp);
+  for (var i in apiData) {
+    var datetime = new Date(apiData[i].timestamp);
     //console.log(parseDate(datetime));
     arr.push(
       {
         ts: datetime,
-        temperature: data[i].data["temperature"],
+        temperature: apiData[i].data["temperature"],
       }
     );
   }
@@ -91,8 +93,10 @@ function drawLineChart(data) {
     .tickSize(8);
 
   var line = d3.line()
+    //.curve(d3.curveBasis)
     .x(function(d) { return x(d.ts)})
     .y(function(d) { return y(d.temperature)});
+
 
   // append x-axis and label
   g.append("g")
@@ -163,29 +167,6 @@ function changeTimeline(e) {
   }
 }
 
-function drawScatterPlot(data) {
-  /*var svgWidth = 600, svgHeight = 380;
-  var margin = { top: 30, right: 30, bottom: 30, left: 30 };
-  var width = svgWidth - margin.left - margin.right;
-  var height = svgHeight - margin.top - margin.bottom;
-
-  var svg = d3.select('svg')
-  .attr("width", svgWidth)
-  .attr("height", svgHeight);
-
-  svg.selectAll("circle")
-  .data(data)
-  .enter()
-  .append("circle")
-  .attr("r", 3)
-  .attr("cx", (d, i) => d.ts)
-  .attr("cy", (d, i) => height - d.temp)
-  .attr("fill", (d) => {
-  return d.temp > 25.0 ? "red" : "blue";
-  });*/
-
-}
-
 function updateChart(data) {
   var x = d3.scaleTime()
     .domain(d3.extent(data, function(d) { return d.ts }))
@@ -210,15 +191,15 @@ function updateChart(data) {
   var svg = d3.select("svg").transition();
 
   svg.select(".line")
-    .duration(1000)  // length of animation in ms
+    .duration(750)  // length of animation in ms
     .attr("d", line);
 
   svg.select(".x-axis")
-    .duration(1000)
+    .duration(750)
     .call(xAxis);
 
   svg.select(".y-axis")
-    .duration(1000)
+    .duration(750)
     .call(yAxis);
 
 /*

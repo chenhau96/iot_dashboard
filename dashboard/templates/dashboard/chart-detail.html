@@ -3,6 +3,10 @@
 {% load static %}
 
 {% block content %}
+<script>
+    var device_id = "{{ device_id }}";
+    var whichData = "{{ whichData }}";
+</script>
 <script src="{% static 'dashboard/scripts/drawCharts.js' %}"></script>
 
 <div class="content-wrapper" style="overflow: hidden">
