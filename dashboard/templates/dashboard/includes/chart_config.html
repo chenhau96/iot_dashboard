@@ -1,13 +1,17 @@
+<h5>Preferences</h5>
 <form action="#">
-    <div class="row" style="padding: 0 0 20px 0;">
-        <div class="col-md-3 padding-right-0">
-            <label for="threshold">Set Threshold: </label>
-            <input id="threshold" type="number" name="threshold" class="threshold-text-box" min="0" max="100" value="30">
+    <div class="form-row form-inline">
+        <div class="form-inline col-auto">
+            <label for="threshold">Threshold: </label>
+            <input id="threshold" type="number" name="threshold"
+                   class="form-control margin-10 threshold-textbox"
+                   min="0" max="100" value="30">
         </div>
 
-        <div class="col-md-2 padding-0">
+        <div class="form-inline col-auto">
             <label for="colors">Color: </label>
-            <select id="colors" name="colors" onchange="changeColor(event)">
+            <select id="colors" name="colors" class="form-control margin-10"
+                    onchange="changeColor(event)">
                 <option value="blue" selected>Blue</option>
                 <option value="red">Red</option>
                 <option value="green">Green</option>
@@ -16,9 +20,9 @@
             </select>
         </div>
 
-        <div class="col-md-3 padding-0">
+        <div class="form-inline col-auto">
             <label for="charts-type">Chart Type: </label>
-            <select id="charts-type" name="charts-type">
+            <select id="charts-type" name="charts-type" class="form-control margin-10">
                 <option value="bar">Bar Chart</option>
                 <option value="line">Line Chart</option>
                 <option value="pie">Pie Chart</option>
@@ -27,9 +31,10 @@
             </select>
         </div>
 
-        <div class="col-md-3 padding-0">
-            <label for="view-by">DateTime: </label>
-            <select id="view-by" name="view-by" onchange="changeTimeline(event)">
+        <div class="form-inline col-auto">
+            <label for="datetime">DateTime: </label>
+            <select id="datetime" name="datetime" class="form-control margin-10"
+                    onchange="changeTimeline(event)">
                 <option value="" selected>- Select DateTime -</option>
                 <option value="today">Today</option>
                 <option value="last7Days">Last 7 Days</option>
@@ -38,8 +43,8 @@
             </select>
         </div>
 
-        <div class="col-md-1 padding-0">
-            <button class="btn-primary" type="submit">Save</button>
+        <div class="col-auto">
+            <button class="btn btn-primary" type="submit">Save</button>
         </div>
     </div>
 </form>

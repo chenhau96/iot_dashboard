@@ -41,10 +41,48 @@ function parseData(data, whichData) {
 }
 
 function drawLineChart(data, whichData) {
+  // Make first letter of each data uppercase, to become the chart title
+  var firstLetterUpper = whichData.charAt(0).toUpperCase();
+  var chartTitle = firstLetterUpper + whichData.substr(1);
 
+  // Generate the url for each chart, to link to chart detail page
+  var url = chart_detail_url.replace("data", whichData);
+
+  // Generate a card skeleton to hold chart title and the chart
   var div = d3.select(".device-charts")
-  .append("div")
-  .attr("id", whichData);
+    .append("div")
+    .attr("class", "row")
+      .append("div")
+      .attr("class", "col-lg-8")
+        .append("div")
+        .attr("class", "card mb-3");
+
+  // Card header to hold the chart title
+  var card_header = div.append("h6")
+    .attr("class", "card-header")
+
+  card_header.append("a")
+    .attr("href", url)
+    .text(chartTitle);
+
+  card_header.append("input")
+    .attr("class", "checkbox success sr-only text-right")
+    .attr("id", "switch-" + whichData)
+    .attr("type", "checkbox")
+    .append("label")
+    .attr("for", "switch-" + whichData)
+    .attr("class", "toggle rounded form-control-label")
+    .attr("aria-hidden", "true")
+    .append("span")
+    .attr("class", "on")
+    .text("On")
+    .append("span", "off")
+    .text("Off");
+
+  // Card body to hold the chart
+  div.append("div")
+    .attr("class", "card-body")
+    .attr("id", whichData);
 
   var svgWidth = 650, svgHeight = 400;
   var margin = { top: 20, right: 20, bottom: 50, left: 80 };
@@ -54,9 +92,9 @@ function drawLineChart(data, whichData) {
   var height_mid = height / 2;
 
   var svg = d3.select('#' + whichData)
-  .append("svg")
-  .attr("width", svgWidth)
-  .attr("height", svgHeight);
+    .append("svg")
+    .attr("width", svgWidth)
+    .attr("height", svgHeight);
 
   var g = svg.append("g")
   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");

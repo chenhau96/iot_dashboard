@@ -17,6 +17,7 @@ var height_mid = height / 2;
 // API URL
 var api = 'http://localhost:8000/api/devices/?device_id=' + device_id +
           '&data=' + whichData;
+
 console.log(api);
 // After everything is loaded
 document.addEventListener("DOMContentLoaded", function(event) {
@@ -33,18 +34,23 @@ function fetchDataFromAPI(api) {
   fetch(api)
     .then(function(response) { return response.json(); })
     .then(function(apiData) {
-      if (!updateFlag) {
-        // First display of chart
-        updateFlag = true;
-        parsedData = parseData(apiData);
-        //console.log(parsedData);
-        drawLineChart(parsedData);
+      if (apiData.length == 0) {
+        alert("Today has no data yet");
       }
       else {
-        // After display the chart, update it every 5s
-        parsedData = parseData(apiData);
-        //console.log(parsedData);
-        updateChart(parsedData);
+        if (!updateFlag) {
+          // First display of chart
+          updateFlag = true;
+          parsedData = parseData(apiData);
+          //console.log(parsedData);
+          drawLineChart(parsedData);
+        }
+        else {
+          // After display the chart, update it every 5s
+          parsedData = parseData(apiData);
+          //console.log(parsedData);
+          updateChart(parsedData);
+        }
       }
     })
 }
@@ -57,7 +63,7 @@ function parseData(apiData) {
     arr.push(
       {
         ts: datetime,
-        temperature: apiData[i].data["temperature"],
+        temperature: apiData[i].data[whichData],
       }
     );
   }
@@ -81,7 +87,8 @@ function drawLineChart(data) {
 
   // scale the range of y-axis
   var y = d3.scaleLinear()
-    .domain(d3.extent(data, function(d) { return d.temperature }))
+    //.domain(d3.extent(data, function(d) { return d.temperature }))
+    .domain([d3.min(data, function(d) { return d.temperature - 5}), d3.max(data, function(d) { return d.temperature + 5})])
     .range([height, 0]);
 
   var xAxis = d3.axisBottom(x)

@@ -12,7 +12,7 @@ urlpatterns = [
     path('device/<slug:dev_id>/', views.device, name='device'),
 
     # Single Chart Page
-    path('device/<slug:dev_id>/<slug:whichData>/',
+    path('device/<slug:dev_id>/<slug:which_data>/',
          views.chart_detail, name='chart_detail'),
 
     # TODO:

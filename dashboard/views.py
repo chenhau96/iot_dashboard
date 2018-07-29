@@ -25,6 +25,7 @@ def device(request, dev_id):
     Display each device dashboard page.
     All charts for individual device will be shown.
 
+    :param request: request object
     :param dev_id: device id
     :return:
     """
@@ -45,28 +46,29 @@ def device(request, dev_id):
                       })
 
 
-def chart_detail(request, dev_id, whichData):
+def chart_detail(request, dev_id, which_data):
     """
     Display individual chart of a device_id with
     chart configuration/settings for personalization
 
     Param:
+    :param request: request object
     :param dev_id: device id
-    :param whichData: data field of a device
+    :param which_data: data field of a device
     :return:
     """
     # TODO: link to a single chart page when click on the chart name
     if not is_device_id_valid(dev_id):
         # if device_id not found, raise Http404
         raise Http404("Device ID \"" + dev_id + "\" does not exist")
-    elif not is_which_data_valid(dev_id, whichData):
+    elif not is_which_data_valid(dev_id, which_data):
         raise Http404("URL \"" + request.path + "\" does not exist")
     else:
         # if device_id is found, render the page
         return render(request, 'dashboard/chart-detail.html',
                       {
                           'device_id': dev_id,
-                          'whichData': whichData,
+                          'whichData': which_data,
                       })
 
 
@@ -87,18 +89,18 @@ def is_device_id_valid(dev_id):
     return valid
 
 
-def is_which_data_valid(dev_id, whichData):
+def is_which_data_valid(dev_id, which_data):
     """
     Check whether data field is valid
 
     :param dev_id: device id
-    :param whichData: data field of a device
+    :param which_data: data field of a device
     :return:
     """
     valid = False
 
     devices_documents = Devices.objects(device_id=dev_id)
-    if whichData in devices_documents[0].data:
+    if which_data in devices_documents[0].data:
         valid = True
 
     return valid
@@ -106,14 +108,19 @@ def is_which_data_valid(dev_id, whichData):
 
 def devices_management(request):
     # TODO: navigate to devices page
-    return render(request, 'dashboard/tables.html')
+    # Get distinct device_id devices
+    devices = Devices.objects.order_by('device_id').distinct('device_id')
+    print(len(devices))
+    return render(request, 'dashboard/tables.html', {
+        'devices': devices,
+    })
 
 
 # For temporary use
 def max_vs_min_view(request):
     return render(request, 'dashboard/chart-detail.html')
 
-"""
+
 def avg_temp(request):
     return render(request, 'dashboard/avg-temp.html')
 
@@ -125,7 +132,7 @@ def precipitationView(request):
 
 def mapView(request):
     return render(request, 'dashboard/mapView.html')
-"""
+
 def device_table(request):
     return render(request, 'dashboard/tables.html')
 
