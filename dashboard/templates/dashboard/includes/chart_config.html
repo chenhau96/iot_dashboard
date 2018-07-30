@@ -1,5 +1,6 @@
 <h5>Preferences</h5>
 <form action="#">
+    {% csrf_token %}
     <div class="form-row form-inline">
         <div class="form-inline col-auto">
             <label for="threshold">Threshold: </label>
@@ -12,11 +13,9 @@
             <label for="colors">Color: </label>
             <select id="colors" name="colors" class="form-control margin-10"
                     onchange="changeColor(event)">
-                <option value="blue" selected>Blue</option>
-                <option value="red">Red</option>
-                <option value="green">Green</option>
-                <option value="yellow">Yellow</option>
-                <option value="orange">Orange</option>
+                {% for color in colorList %}
+                    <option value="{{ color|cut:" " }}">{{ color|title }}</option>
+                {% endfor %}
             </select>
         </div>
 
@@ -37,6 +36,7 @@
                     onchange="changeTimeline(event)">
                 <option value="" selected>- Select DateTime -</option>
                 <option value="today">Today</option>
+                <option value="last3Days">Last 3 Days</option>
                 <option value="last7Days">Last 7 Days</option>
                 <option value="thisMonth">This Month</option>
                 <option value="thisYear">This Year</option>

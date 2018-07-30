@@ -6,6 +6,7 @@ import datetime
 import json
 
 from dashboard.models import Devices
+from dashboard.selectionItems import *
 
 from rest_framework_mongoengine import viewsets
 from dashboard.serializers import DevicesSerializer
@@ -29,7 +30,6 @@ def device(request, dev_id):
     :param dev_id: device id
     :return:
     """
-    # TODO: individual device dashboard page
 
     devices = Devices.objects(device_id=dev_id)
 
@@ -57,7 +57,8 @@ def chart_detail(request, dev_id, which_data):
     :param which_data: data field of a device
     :return:
     """
-    # TODO: link to a single chart page when click on the chart name
+
+
     if not is_device_id_valid(dev_id):
         # if device_id not found, raise Http404
         raise Http404("Device ID \"" + dev_id + "\" does not exist")
@@ -69,6 +70,7 @@ def chart_detail(request, dev_id, which_data):
                       {
                           'device_id': dev_id,
                           'whichData': which_data,
+                          'colorList': colorList,
                       })
 
 
@@ -120,7 +122,6 @@ def devices_management(request):
 def max_vs_min_view(request):
     return render(request, 'dashboard/chart-detail.html')
 
-
 def avg_temp(request):
     return render(request, 'dashboard/avg-temp.html')
 
@@ -151,7 +152,7 @@ class DevicesViewSet(viewsets.ModelViewSet):
         # Get all device objects order by timestamp
         queryset = Devices.objects.order_by('timestamp')
 
-        # Get device_id, timestamp, data in API parameter
+        # Get device_id, timestamp, data in API request parameter
         device_id = self.request.query_params.get('device_id', None)
         timestamp = self.request.query_params.get('timestamp', None)
         data = self.request.query_params.get('data', None)
@@ -159,7 +160,7 @@ class DevicesViewSet(viewsets.ModelViewSet):
         if device_id is not None:
             """
             Filter queryset to retrieve a specific device_id
-            if 'device_id' param present in API url parameter
+            if 'device_id' request param present in API url parameter
             
             E.g. http://localhost:8000/api/devices/?device_id=00-80-00-00-00-01-1e-d8
             """
@@ -168,7 +169,7 @@ class DevicesViewSet(viewsets.ModelViewSet):
         if timestamp is not None:
             """
             Filter queryset to retrieve a range of timestamp
-            if 'timestamp' param present in API url parameter
+            if 'timestamp' request param present in API url parameter
             
             E.g. http://localhost:8000/api/devices/?timestamp=last7day
             """
@@ -195,7 +196,7 @@ class DevicesViewSet(viewsets.ModelViewSet):
         if data is not None:
             """
             Filter queryset to retrieve a specific datafield/columns
-            if 'data' param present in API url parameter
+            if 'data' request param present in API url parameter
             
             E.g. http://localhost:8000/api/devices/?data=temperature
             """

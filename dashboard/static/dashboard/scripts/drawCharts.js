@@ -1,5 +1,11 @@
 
-var color;
+var chart_config = {
+  threshold: 30,
+  color: "steelblue",
+  chartType: "lineChart",
+  timeline: "last3Days",
+};
+
 var parsedData;
 var ttFormatTime = d3.timeFormat("%d-%m-%Y %X");
 var iconCels = "\u2103";  // Celsius icon
@@ -18,10 +24,9 @@ var height_mid = height / 2;
 var api = 'http://localhost:8000/api/devices/?device_id=' + device_id +
           '&data=' + whichData;
 
-console.log(api);
 // After everything is loaded
 document.addEventListener("DOMContentLoaded", function(event) {
-  color = document.getElementById("colors").value;
+  // Fetch data from API
   fetchDataFromAPI(api);
 
   // Update the charts based on updateInterval value
@@ -42,7 +47,7 @@ function fetchDataFromAPI(api) {
           // First display of chart
           updateFlag = true;
           parsedData = parseData(apiData);
-          //console.log(parsedData);
+          console.log(parsedData);
           drawLineChart(parsedData);
         }
         else {
@@ -57,12 +62,18 @@ function fetchDataFromAPI(api) {
 
 function parseData(apiData) {
   var arr = [];
+
   for (var i in apiData) {
+    // Convert API string date to Date object
     var datetime = new Date(apiData[i].timestamp);
-    //console.log(parseDate(datetime));
+
+    // Convert to local datetime
+    var localDateTime = datetime.getTime() - (datetime.getTimezoneOffset() * 60000);
+
+    // Push the essential data to an array
     arr.push(
       {
-        ts: datetime,
+        ts: localDateTime,
         temperature: apiData[i].data[whichData],
       }
     );
@@ -91,13 +102,17 @@ function drawLineChart(data) {
     .domain([d3.min(data, function(d) { return d.temperature - 5}), d3.max(data, function(d) { return d.temperature + 5})])
     .range([height, 0]);
 
+  // define x-axis
   var xAxis = d3.axisBottom(x)
-    .tickSize(8);   // length of the each tick
+    .tickSize(-height)   // length of the each tick
+    .tickPadding(10);
     //.ticks(d3.timeHour.every(24))
     //.tickFormat(d3.timeFormat("%m-%d"));
 
+  // define y-axis
   var yAxis = d3.axisLeft(y)
-    .tickSize(8);
+    .tickSize(-width)
+    .tickPadding(10);
 
   var line = d3.line()
     //.curve(d3.curveBasis)
@@ -130,14 +145,16 @@ function drawLineChart(data) {
     .attr("text-anchor", "end")
     .text("Temperature " + iconCels);
 
+  // add line path of the line chart
   g.append("path")
     .datum(data)
     .attr("class", "line")
     .attr("fill", "none")
-    .attr("stroke", color)
+    .attr("stroke", chart_config.color)
     .attr("stroke-width", 1.5)
-    .attr("d", line);
+    .attr("d", line(data));
 
+  // add data points to the line
   g.selectAll("circle").data(data).enter()
     .append("circle")
     .attr("class", "dotPoint")
@@ -145,36 +162,49 @@ function drawLineChart(data) {
     .attr("cx", (d, i) => x(d.ts))
     .attr("cy", (d, i) => y(d.temperature))
     .attr("fill", (d) => {
+      // if beyond threshold, change data point's color to red
       return (d.temperature >= 30) ? "red" : "blue";
     });
 }
 
+// Change color function
 function changeColor(e) {
-  color = e.target.value;
+  // Get value from color drop down list
+  var color = e.target.value;
+
+  // Change the color of the line
   d3.select(".line").attr("stroke", color);
 }
 
+// Change timeline function
 function changeTimeline(e) {
+  // Get value from timeline drop down lsit
   var timeline = e.target.value;
+
+  // Set new API call to retrieve new set of data
   if (timeline == "today") {
     api = 'http://localhost:8000/api/devices/?timestamp=today';
-    fetchDataFromAPI(api);
+  }
+  else if (timeline == "last3Days") {
+    api = 'http://localhost:8000/api/devices/?timestamp=last3day';
   }
   else if (timeline == "last7Days") {
     api = 'http://localhost:8000/api/devices/?timestamp=last7day';
-    fetchDataFromAPI(api);
   }
   else if (timeline == "thisMonth") {
     api = 'http://localhost:8000/api/devices/?timestamp=this-month';
-    fetchDataFromAPI(api);
   }
   else if (timeline == "thisYear") {
     api = 'http://localhost:8000/api/devices/?timestamp=this-year';
-    fetchDataFromAPI(api);
   }
+
+  // Fetch data from new API
+  fetchDataFromAPI(api);
 }
 
+// Update chart function
 function updateChart(data) {
+  // Scale the x and y axis again
   var x = d3.scaleTime()
     .domain(d3.extent(data, function(d) { return d.ts }))
     .range([0, width]);
@@ -196,15 +226,27 @@ function updateChart(data) {
     .y(function(d) { return y(d.temperature)});
 
   var svg = d3.select("svg").transition();
+  var path = d3.selectAll(".line").data(data);
 
-  svg.select(".line")
-    .duration(750)  // length of animation in ms
-    .attr("d", line);
+  // Delete the old line path from the chart
+  path.exit().remove();
 
+  // Add new line path to the chart
+  path
+    .enter()
+    .append("path")
+    .merge(path)
+    .attr("class", "line")
+    .transition()
+    .duration(750)  // length of animation in ms;
+    .attr("d", line(data))
+
+  // Update the x-axis
   svg.select(".x-axis")
     .duration(750)
     .call(xAxis);
 
+  // Update the y-axis
   svg.select(".y-axis")
     .duration(750)
     .call(yAxis);
