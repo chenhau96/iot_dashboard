@@ -58,7 +58,6 @@ def chart_detail(request, dev_id, which_data):
     :return:
     """
 
-
     if not is_device_id_valid(dev_id):
         # if device_id not found, raise Http404
         raise Http404("Device ID \"" + dev_id + "\" does not exist")
@@ -71,6 +70,8 @@ def chart_detail(request, dev_id, which_data):
                           'device_id': dev_id,
                           'whichData': which_data,
                           'colorList': colorList,
+                          'chartTypeList': chartTypeList,
+                          'timelineList': timelineList,
                       })
 
 

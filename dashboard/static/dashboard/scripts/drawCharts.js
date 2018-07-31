@@ -4,13 +4,16 @@ var chart_config = {
   color: "steelblue",
   chartType: "lineChart",
   timeline: "last3Days",
+  includeInMain: false,
 };
 
 var parsedData;
+var chartTitle = "";
 var ttFormatTime = d3.timeFormat("%d-%m-%Y %X");
 var iconCels = "\u2103";  // Celsius icon
 var updateFlag = false;
-var updateInterval = 30000; // 30 seconds
+var updateInterval = 30000; // 30s
+var transitionDuration = 750; // 750ms
 
 // Chart width and height setting
 var svgWidth = 650, svgHeight = 400;
@@ -26,6 +29,15 @@ var api = 'http://localhost:8000/api/devices/?device_id=' + device_id +
 
 // After everything is loaded
 document.addEventListener("DOMContentLoaded", function(event) {
+  // Make first letter of each data uppercase, to become the chart title
+  var firstLetterUpper = whichData.charAt(0).toUpperCase();
+  chartTitle = firstLetterUpper + whichData.substr(1);
+  d3.select(".chart-title").text(chartTitle);
+
+  // Set color to saved config value
+  var color = document.getElementById("colors");
+  color.value = chart_config.color;
+
   // Fetch data from API
   fetchDataFromAPI(api);
 
@@ -40,21 +52,19 @@ function fetchDataFromAPI(api) {
     .then(function(response) { return response.json(); })
     .then(function(apiData) {
       if (apiData.length == 0) {
-        alert("Today has no data yet");
+        alert("No data to be retrieved.");
       }
       else {
+        parsedData = parseData(apiData);
+
         if (!updateFlag) {
           // First display of chart
           updateFlag = true;
-          parsedData = parseData(apiData);
-          console.log(parsedData);
           drawLineChart(parsedData);
         }
         else {
           // After display the chart, update it every 5s
-          parsedData = parseData(apiData);
-          //console.log(parsedData);
-          updateChart(parsedData);
+          updateLineChart(parsedData);
         }
       }
     })
@@ -82,11 +92,12 @@ function parseData(apiData) {
 }
 
 function drawLineChart(data) {
-
+  // Set svg width and height
   var svg = d3.select('svg')
     .attr("width", svgWidth)
     .attr("height", svgHeight);
 
+  // Set the chart position within the svg
   var g = svg.append("g")
     .attr("class", "chart")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -98,8 +109,8 @@ function drawLineChart(data) {
 
   // scale the range of y-axis
   var y = d3.scaleLinear()
-    //.domain(d3.extent(data, function(d) { return d.temperature }))
-    .domain([d3.min(data, function(d) { return d.temperature - 5}), d3.max(data, function(d) { return d.temperature + 5})])
+    .domain(d3.extent(data, function(d) { return d.temperature }))
+    //.domain([d3.min(data, function(d) { return d.temperature - 5}), d3.max(data, function(d) { return d.temperature + 5})])
     .range([height, 0]);
 
   // define x-axis
@@ -114,13 +125,13 @@ function drawLineChart(data) {
     .tickSize(-width)
     .tickPadding(10);
 
+  // d3's line generator
   var line = d3.line()
-    //.curve(d3.curveBasis)
+    .curve(d3.curveLinear)
     .x(function(d) { return x(d.ts)})
     .y(function(d) { return y(d.temperature)});
 
-
-  // append x-axis and label
+  // append x-axis and label in a group tag
   g.append("g")
     .attr("class", "x-axis")
     .attr("transform", "translate(0," + height + ")")
@@ -132,7 +143,7 @@ function drawLineChart(data) {
     .attr("text-anchor", "middle")
     .text("Timeline");
 
-  // append y-axis and label
+  // append y-axis and label in a group tag
   g.append("g")
     .attr("class", "y-axis")
     .call(yAxis)
@@ -143,7 +154,11 @@ function drawLineChart(data) {
     .attr("y", 30 - margin.left)
     .attr("transform", "rotate(-90)")
     .attr("text-anchor", "end")
-    .text("Temperature " + iconCels);
+    .text(() => {
+      if (chartTitle == "Temperature")
+        chartTitle += " " + iconCels;
+      return chartTitle;
+    });
 
   // add line path of the line chart
   g.append("path")
@@ -163,7 +178,7 @@ function drawLineChart(data) {
     .attr("cy", (d, i) => y(d.temperature))
     .attr("fill", (d) => {
       // if beyond threshold, change data point's color to red
-      return (d.temperature >= 30) ? "red" : "blue";
+      return (d.temperature >= 30) ? "#e60000" : " #000066";
     });
 }
 
@@ -202,8 +217,16 @@ function changeTimeline(e) {
   fetchDataFromAPI(api);
 }
 
+function changeThreshold(e) {
+  var thres = e.value;
+  d3.selectAll("circle")
+    .attr("fill", (parsedData) => {
+      return (parsedData.temperature >= thres) ? "#e60000" : " #000066";
+    });
+}
+
 // Update chart function
-function updateChart(data) {
+function updateLineChart(data) {
   // Scale the x and y axis again
   var x = d3.scaleTime()
     .domain(d3.extent(data, function(d) { return d.ts }))
@@ -213,6 +236,7 @@ function updateChart(data) {
     .domain(d3.extent(data, function(d) { return d.temperature }))
     .range([height, 0]);
 
+  // Define the x and y axis
   var xAxis = d3.axisBottom(x)
     .tickSize(8);   // length of the each tick
     //.ticks(d3.timeHour.every(24))
@@ -221,56 +245,56 @@ function updateChart(data) {
   var yAxis = d3.axisLeft(y)
     .tickSize(8);
 
+  // Generate the line
   var line = d3.line()
+    .curve(d3.curveLinear)
     .x(function(d) { return x(d.ts)})
     .y(function(d) { return y(d.temperature)});
 
   var svg = d3.select("svg").transition();
-  var path = d3.selectAll(".line").data(data);
+  var path = d3.selectAll(".line");
 
   // Delete the old line path from the chart
   path.exit().remove();
 
   // Add new line path to the chart
   path
+    .data(data)
     .enter()
     .append("path")
     .merge(path)
     .attr("class", "line")
     .transition()
-    .duration(750)  // length of animation in ms;
-    .attr("d", line(data))
+    .duration(transitionDuration)
+    .attrTween("d", function() {
+      // Do interpolation on previous data for a smooth transition
+      var previous = d3.select(this).attr("d");
+      var current = line(data);
+      return d3.interpolatePath(previous, current);
+    })
 
   // Update the x-axis
   svg.select(".x-axis")
-    .duration(750)
+    .duration(transitionDuration)
     .call(xAxis);
 
   // Update the y-axis
   svg.select(".y-axis")
-    .duration(750)
+    .duration(transitionDuration)
     .call(yAxis);
 
-/*
   // update all circles
   d3.selectAll("circle")
     .data(data)
-    .transition()
-    .duration(1000)
-    .attr("cx", (d, i) => x(d.ts))
-    .attr("cy", (d, i) => y(d.temperature));
-
-  d3.select("svg").selectAll("circle")
-    .data(data)
     .enter()
     .append("circle")
-    .attr("r", 3)
     .attr("cx", (d, i) => x(d.ts))
-    .attr("cy", (d, i) => y(d.temperature));
+    .attr("cy", (d, i) => y(d.temperature))
+    .transition()
+    .duration(1000);
 
   d3.select("svg").selectAll("circle")
-    .data(data)
     .exit()
-    .remove();*/
+    .remove();
 }
 

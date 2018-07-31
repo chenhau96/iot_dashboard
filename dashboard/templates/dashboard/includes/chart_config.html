@@ -2,13 +2,15 @@
 <form action="#">
     {% csrf_token %}
     <div class="form-row form-inline">
+        <!-- Threshold -->
         <div class="form-inline col-auto">
             <label for="threshold">Threshold: </label>
             <input id="threshold" type="number" name="threshold"
                    class="form-control margin-10 threshold-textbox"
-                   min="0" max="100" value="30">
+                   min="0" max="100" value="30" onchange="changeThreshold(event)">
         </div>
 
+        <!-- Color -->
         <div class="form-inline col-auto">
             <label for="colors">Color: </label>
             <select id="colors" name="colors" class="form-control margin-10"
@@ -19,30 +21,28 @@
             </select>
         </div>
 
+        <!-- Chart Type -->
         <div class="form-inline col-auto">
             <label for="charts-type">Chart Type: </label>
             <select id="charts-type" name="charts-type" class="form-control margin-10">
-                <option value="bar">Bar Chart</option>
-                <option value="line">Line Chart</option>
-                <option value="pie">Pie Chart</option>
-                <option value="scatterplot">Scatter Plot</option>
-                <option value="histogram">Histogram</option>
+                {% for chartType in chartTypeList %}
+                    <option value="{{ chartType|cut:" " }}">{{ chartType|title }}</option>
+                {% endfor %}
             </select>
         </div>
 
+        <!-- Timeline -->
         <div class="form-inline col-auto">
-            <label for="datetime">DateTime: </label>
+            <label for="datetime">Timeline: </label>
             <select id="datetime" name="datetime" class="form-control margin-10"
                     onchange="changeTimeline(event)">
-                <option value="" selected>- Select DateTime -</option>
-                <option value="today">Today</option>
-                <option value="last3Days">Last 3 Days</option>
-                <option value="last7Days">Last 7 Days</option>
-                <option value="thisMonth">This Month</option>
-                <option value="thisYear">This Year</option>
+                {% for timeline in timelineList %}
+                    <option value="{{ timeline|cut:" " }}">{{ timeline|title }}</option>
+                {% endfor %}
             </select>
         </div>
 
+        <!-- Save button -->
         <div class="col-auto">
             <button class="btn btn-primary" type="submit">Save</button>
         </div>
