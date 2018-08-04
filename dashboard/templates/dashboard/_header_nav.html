@@ -17,8 +17,10 @@
     <link href="{% static 'dashboard/vendor/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
     <!-- Custom styles for this template-->
     <link href="{% static 'dashboard/css/sb-admin.css' %}" rel="stylesheet">
+
     <!-- Charts styling -->
     <link href="{% static 'dashboard/css/charts.css' %}" rel="stylesheet">
+    <link href="{% static 'dashboard/css/navigation.css' %}" rel="stylesheet">
 
     <!-- Bootstrap core JavaScript-->
     <script src="{% static 'dashboard/vendor/jquery/jquery.min.js' %}"></script>
@@ -29,179 +31,117 @@
     <!-- import D3.js and D3 external libraries -->
     <script src="{% static 'dashboard/d3/d3.min.js' %}"></script>
     <script src="{% static 'dashboard/d3-interpolate-path/d3-interpolate-path.min.js' %}"></script>
+
+    <script src="{% static 'dashboard/scripts/navigation.js' %}"></script>
 </head>
 
-<body class="fixed-nav bg-dark" id="page-top">
-    <!--
-    <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
-        <a class="navbar-brand" href="{% url 'dashboard:index' %}">IoT Dashboard</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+<body>
+    <div class="wrapper">
+        <!-- Sidebar  -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <a class="navbar-brand" href="{% url 'dashboard:index' %}"><h3>IoT Dashboard</h3></a>
+                <a class="navbar-brand" href="{% url 'dashboard:index' %}"><i class="fa fa-home fa-3x home"></i></a>
+            </div>
 
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle mr-lg-2" id="alertsDropdown" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa fa-fw fa-bell"></i>
+            <ul class="list-unstyled components">
+                <li>
+                    <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                        <i class="fa fa-tachometer icon-margin"></i>
+                        Dashboard
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="alertsDropdown">
-                        <h6 class="dropdown-header">New Alerts:</h6>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">
-							<span class="text-success">
-								<strong><i class="fa fa-long-arrow-up fa-fw"></i>Status Update</strong>
-							</span>
-                            <span class="small float-right text-muted">11:21 AM</span>
-                            <div class="dropdown-message small">This is an automated server response message. All systems are online.</div>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">
-							<span class="text-danger">
-								<strong><i class="fa fa-long-arrow-down fa-fw"></i>Status Update</strong>
-							</span>
-							<span class="small float-right text-muted">11:21 AM</span>
-                            <div class="dropdown-message small">This is an automated server response message. All systems are online.</div>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">
-							<span class="text-success">
-								<strong><i class="fa fa-long-arrow-up fa-fw"></i>Status Update</strong>
-							</span>
-                            <span class="small float-right text-muted">11:21 AM</span>
-                            <div class="dropdown-message small">This is an automated server response message. All systems are online.</div>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item small" href="#">View all alerts</a>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="modal" data-target="#exampleModal">
-                        <i class="fa fa-fw fa-sign-out"></i>Logout</a>
-                </li>
-            </ul>
-
-
-        </div>
-    </nav>
-    -->
-
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
-        <a class="navbar-brand" href="{% url 'dashboard:index' %}">IoT Dashboard</a>
-        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
-            <!-- Navigation side bar -->
-            <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
-                <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">
-                    <a class="nav-link" href="{% url 'dashboard:index' %}">
-                        <i class="fa fa-fw fa-dashboard"></i>
-                        <span class="nav-link-text">Dashboard</span>
-                    </a>
-                    <ul>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'dashboard:device' dev_id="00-80-00-00-00-01-1e-d7" %}">
-                                <i class="fa fa-fw fa-dashboard"></i>
-                                <span class="nav-link-text">Device 1</span>
-                            </a>
+                    <ul class="collapse list-unstyled" id="homeSubmenu">
+                        <li>
+                            <a href="{% url 'dashboard:index' %}">Main Dashboard</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'dashboard:device' dev_id="00-80-00-00-00-01-1e-d7" %}">
-                                <i class="fa fa-fw fa-dashboard"></i>
-                                <span class="nav-link-text">Device 2</span>
-                            </a>
+                        <!--
+                        A for loop will be here later to loop through devices
+                        -->
+                        <li>
+                            <a href="{% url 'dashboard:device' dev_id="00-80-00-00-00-01-1e-d7" %}">Device 1</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'dashboard:device' dev_id="00-80-00-00-00-01-1e-d7" %}">Device 2</a>
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Tables">
-                    <a class="nav-link" href="{% url 'dashboard:device_table' %}">
-                        <i class="fa fa-fw fa-table"></i>
-                        <span class="nav-link-text">Devices</span>
+                <li>
+                    <a href="{% url 'dashboard:devices_management' %}">
+                        <i class="fa fa-table icon-margin"></i>
+                        Device Management
                     </a>
                 </li>
             </ul>
+        </nav>
 
-            <!-- Navigation side bar toggle -->
-            <ul class="navbar-nav sidenav-toggler">
-                <li class="nav-item">
-                    <a class="nav-link text-center" id="sidenavToggler">
-                        <i class="fa fa-fw fa-angle-left"></i>
-                    </a>
-                </li>
-            </ul>
+        <!-- Page Content  -->
+        <div id="content" class="container-fluid">
+            <!-- Header Bar -->
+            <div class="header">
+                <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                    <!-- Menu Button -->
+                    <button type="button" id="sidebarCollapse" class="btn btn-primary">
+                        <i class="fa fa-bars"></i>
+                    </button>
 
-            <!-- Alert -->
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle mr-lg-2" id="alertsDropdown" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa fa-fw fa-bell"></i>
-                        <span class="d-lg-none">Alerts
-							<span class="badge badge-pill badge-warning">6 New</span>
-						</span>
-                        <span class="indicator text-warning d-none d-lg-block">
-							<i class="fa fa-fw fa-circle"></i>
-						</span>
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="alertsDropdown">
-                        <h6 class="dropdown-header">New Alerts:</h6>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">
-							<span class="text-success">
-								<strong><i class="fa fa-long-arrow-up fa-fw"></i>Status Update</strong>
-							</span>
-                            <span class="small float-right text-muted">11:21 AM</span>
-                            <div class="dropdown-message small">This is an automated server response message. All systems are online.</div>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">
-							<span class="text-danger">
-								<strong><i class="fa fa-long-arrow-down fa-fw"></i>Status Update</strong>
-							</span>
-							<span class="small float-right text-muted">11:21 AM</span>
-                            <div class="dropdown-message small">This is an automated server response message. All systems are online.</div>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">
-							<span class="text-success">
-								<strong><i class="fa fa-long-arrow-up fa-fw"></i>Status Update</strong>
-							</span>
-                            <span class="small float-right text-muted">11:21 AM</span>
-                            <div class="dropdown-message small">This is an automated server response message. All systems are online.</div>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item small" href="#">View all alerts</a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <!-- List of header items -->
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav ml-auto">
+                            <li class="nav-item dropdown">
+                                <a href="#" class="dropdown-toggle header-item" id="alertsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fa fa-bell"></i>
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="alertsDropdown">
+                                    <h6 class="dropdown-header">New Alerts:</h6>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="#">
+                                        <span class="text-success">
+                                            <strong><i class="fa fa-long-arrow-up fa-fw"></i>Status Update</strong>
+                                        </span>
+                                        <span class="small float-right text-muted">11:21 AM</span>
+                                        <div class="dropdown-message small">This is an automated server response message. All systems are online.</div>
+                                    </a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="#">
+                                        <span class="text-danger">
+                                            <strong><i class="fa fa-long-arrow-down fa-fw"></i>Status Update</strong>
+                                        </span>
+                                        <span class="small float-right text-muted">11:21 AM</span>
+                                        <div class="dropdown-message small">This is an automated server response message. All systems are online.</div>
+                                    </a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="#">
+                                        <span class="text-success">
+                                            <strong><i class="fa fa-long-arrow-up fa-fw"></i>Status Update</strong>
+                                        </span>
+                                        <span class="small float-right text-muted">11:21 AM</span>
+                                        <div class="dropdown-message small">This is an automated server response message. All systems are online.</div>
+                                    </a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item small" href="#">View all alerts</a>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="header-item">
+                                    <i class="fa fa-sign-out"></i>
+                                    Logout
+                                </a>
+                            </li>
+                        </ul>
                     </div>
-                </li>
+                </nav>
+            </div>
 
-                <!-- Searching -->
-                <li class="nav-item">
-                    <form class="form-inline my-2 my-lg-0 mr-lg-2">
-                        <div class="input-group">
-                            <input class="form-control" type="text" placeholder="Search for...">
-                            <span class="input-group-append">
-                                <button class="btn btn-primary" type="button">
-                                    <i class="fa fa-search"></i>
-                                </button>
-                            </span>
-                        </div>
-                    </form>
-                </li>
+            <!-- Page Content For Different Pages -->
+            {% block content %}
+            {% endblock %}
 
-                <!-- Login/Logout button -->
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="modal" data-target="#exampleModal">
-                        <i class="fa fa-fw fa-sign-out"></i>Logout</a>
-                </li>
-            </ul>
         </div>
-    </nav>
-
-    <!-- Content for different pages -->
-    {% block content %}
-    {% endblock %}
-
+    </div>
 </body>
 
 </html>

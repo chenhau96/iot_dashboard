@@ -9,38 +9,37 @@
 </script>
 <script src="{% static 'dashboard/scripts/drawCharts.js' %}"></script>
 
-<div class="content-wrapper" style="overflow: hidden">
-    <div class="container-fluid">
-        <!-- Chart filtering/configuration -->
-        {% include "dashboard/includes/chart_config.html" %}
+<div class="container-fluid">
+    <!-- Chart filtering/configuration -->
+    {% include "dashboard/includes/chart_config.html" %}
 
-        <!-- Chart -->
-        <div class="row">
-            <div class="col-lg-8">
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <h6 class="chart-title"></h6>
-                        <div class="form-check show-in-main">
-                            <input class="form-check-input" type="checkbox">
-                            <label class="form-check-label">Show in Main Dashboard</label>
+    <!-- Chart -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h6 class="chart-title"></h6>
+                    <div class="form-check show-in-main">
+                        <input class="form-check-input" type="checkbox">
+                        <label class="form-check-label">Show in Main Dashboard</label>
 
-                        </div>
-
-                        <!--
-                        <label style="float: right" class="switch">
-                          <input type="checkbox">
-                          <span class="slider round"></span>
-                        </label>
-                        <label style="float: right">Show in Main Dashboard</label>
-                        -->
                     </div>
-                    <div class="card-body">
-                        <svg></svg>
-                    </div>
+
+                    <!--
+                    <label style="float: right" class="switch">
+                      <input type="checkbox">
+                      <span class="slider round"></span>
+                    </label>
+                    <label style="float: right">Show in Main Dashboard</label>
+                    -->
+                </div>
+                <div class="card-body">
+                    <svg></svg>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 {% endblock %}
 
