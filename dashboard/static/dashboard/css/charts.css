@@ -19,7 +19,16 @@
 
 .chart-title {
   float: left;
+}
 
+.show-in-main {
+  float: right;
+}
+
+#navbarSupportedContent ul li:hover div {
+    left:auto;
+    right:0;
+    margin-right:-10px;
 }
 
 /* Set margin left right 10px */

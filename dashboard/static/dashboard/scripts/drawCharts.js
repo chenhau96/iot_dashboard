@@ -12,8 +12,8 @@ var chartTitle = "";
 var ttFormatTime = d3.timeFormat("%d-%m-%Y %X");
 var iconCels = "\u2103";  // Celsius icon
 var updateFlag = false;
-var updateInterval = 30000; // 30s
-var transitionDuration = 750; // 750ms
+var updateInterval = 60000; // 30s
+var transitionDuration = 1000; // 750ms
 
 // Chart width and height setting
 var svgWidth = 650, svgHeight = 400;
@@ -52,7 +52,7 @@ function fetchDataFromAPI(api) {
     .then(function(response) { return response.json(); })
     .then(function(apiData) {
       if (apiData.length == 0) {
-        alert("No data to be retrieved.");
+        alert("No data is retrieved.");
       }
       else {
         parsedData = parseData(apiData);
@@ -218,10 +218,15 @@ function changeTimeline(e) {
 }
 
 function changeThreshold(e) {
-  var thres = e.value;
-  d3.selectAll("circle")
-    .attr("fill", (parsedData) => {
-      return (parsedData.temperature >= thres) ? "#e60000" : " #000066";
+  var newThreshold = e.target.value;
+  console.log(newThreshold);
+
+  d3.select(".chart").selectAll("circle").data(parsedData)
+    .enter()
+    .append("circle")
+    .attr("fill", (d) => {
+      // if beyond threshold, change data point's color to red
+      return (d.temperature >= newThreshold) ? "#e60000" : " #000066";
     });
 }
 
@@ -252,12 +257,10 @@ function updateLineChart(data) {
     .y(function(d) { return y(d.temperature)});
 
   var svg = d3.select("svg").transition();
-  var path = d3.selectAll(".line");
+  var path = d3.selectAll("path.line");
 
-  // Delete the old line path from the chart
-  path.exit().remove();
-
-  // Add new line path to the chart
+  /** Update Line **/
+  // Update new line path to the chart
   path
     .data(data)
     .enter()
@@ -265,13 +268,16 @@ function updateLineChart(data) {
     .merge(path)
     .attr("class", "line")
     .transition()
-    .duration(transitionDuration)
+    .duration(1000)
     .attrTween("d", function() {
       // Do interpolation on previous data for a smooth transition
       var previous = d3.select(this).attr("d");
       var current = line(data);
       return d3.interpolatePath(previous, current);
-    })
+    });
+
+  // Delete the old line path from the chart
+  path.exit().remove();
 
   // Update the x-axis
   svg.select(".x-axis")
@@ -283,18 +289,38 @@ function updateLineChart(data) {
     .duration(transitionDuration)
     .call(yAxis);
 
-  // update all circles
-  d3.selectAll("circle")
-    .data(data)
-    .enter()
-    .append("circle")
+  /** Update Circle **/
+  // Update existing data points
+  d3.select(".chart").selectAll("circle").data(data)
+    .attr("class", "dotPoint")
+    .attr("r", 4)
     .attr("cx", (d, i) => x(d.ts))
     .attr("cy", (d, i) => y(d.temperature))
+    .attr("fill", (d) => {
+      // if beyond threshold, change data point's color to red
+      return (d.temperature >= 30) ? "#e60000" : " #000066";
+    })
     .transition()
-    .duration(1000);
+    .duration(transitionDuration);
 
-  d3.select("svg").selectAll("circle")
+  // Create new data points, if there is new data
+  d3.select(".chart").selectAll("circle").data(data)
+    .enter()
+    .append("circle")
+    .attr("class", "dotPoint")
+    .attr("r", 4)
+    .attr("cx", (d, i) => x(d.ts))
+    .attr("cy", (d, i) => y(d.temperature))
+    .attr("fill", (d) => {
+      // if beyond threshold, change data point's color to red
+      return (d.temperature >= 30) ? "#e60000" : " #000066";
+    });
+
+  // Remove old data points
+  d3.select(".chart").selectAll("circle")
+    .data(data)
     .exit()
     .remove();
+
 }
 
