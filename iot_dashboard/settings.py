@@ -95,6 +95,12 @@ _MONGODB_DATABASE_HOST = \
 mongoengine.connect(_MONGODB_NAME, host=_MONGODB_DATABASE_HOST)
 
 
+# Authentication
+AUTHENTICATION_BACKENDS = (
+    'mongoengine.django.auth.MongoEngineBackend',
+)
+
+
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
 

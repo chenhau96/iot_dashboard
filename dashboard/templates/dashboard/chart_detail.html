@@ -20,7 +20,9 @@
                 <div class="card-header">
                     <h6 class="chart-title"></h6>
                     <div class="form-check show-in-main">
-                        <input class="form-check-input" type="checkbox">
+                        <input class="form-check-input" type="checkbox"
+                               name="isIncluded" value="{{ whichData }}"
+                               onchange="isChecked(this)">
                         <label class="form-check-label">Show in Main Dashboard</label>
 
                     </div>

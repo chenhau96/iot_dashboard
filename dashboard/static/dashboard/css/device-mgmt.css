@@ -1,0 +1,15 @@
+.right {
+  float: right;
+}
+
+.left {
+  float: left;
+}
+
+.offline {
+  color: red;
+}
+
+.online {
+  color: green;
+}

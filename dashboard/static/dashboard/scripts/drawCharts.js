@@ -230,6 +230,33 @@ function changeThreshold(e) {
     });
 }
 
+  var included = [];  // Array for storing checkboxes value
+
+function isChecked(checkbox) {
+  /*var isIncludedCb = document.getElementsByName("isIncluded");
+  for (var i = 0; i < isIncludedCb.length; i++) {
+    if (isIncludedCb[i].checked) {
+      included.push(isIncludedCb[i].value);
+    }
+  }*/
+
+  if (checkbox.checked) {
+    included.push(checkbox.value);
+    alert("Included in Main Dashboard");
+  }
+  else {
+    for (var i = 0; i < included.length; i++) {
+      if (checkbox.value == included[i]) {
+        console.log("Remove");
+        included.splice(i, 1);
+        alert("Removed from Main Dashboard");
+      }
+    }
+  }
+
+  console.log(included);
+}
+
 // Update chart function
 function updateLineChart(data) {
   // Scale the x and y axis again
@@ -321,6 +348,5 @@ function updateLineChart(data) {
     .data(data)
     .exit()
     .remove();
-
 }
 

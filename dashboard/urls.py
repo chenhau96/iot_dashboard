@@ -19,6 +19,10 @@ urlpatterns = [
     # Device Management Page
     path('devices/management', views.devices_management, name='devices_management'),
 
+    # Device Add/Update Form Page
+    path('devices/management/form', views.device_form, name='device_form'),
+
+
     # For temporary use
     path('max_vs_min_view/', views.max_vs_min_view, name='max_vs_min_view'),
     path('avg_temp/', views.avg_temp, name='avg_temp'),
