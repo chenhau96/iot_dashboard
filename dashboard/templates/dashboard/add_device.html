@@ -3,14 +3,25 @@
 {% load static %}
 
 {% block content %}
-<form action="#" method="post">
+
+<div id="device_form" class="form-margin">
+
+<h3>Add Device</h3>
+
+<form action="{% url 'dashboard:add_device' %}" method="post">
     {% csrf_token %}
+
+    {% if error_message %}
+        <div class="alert alert-danger">
+          <strong>{{ error_message }}</strong>
+        </div>
+    {% endif %}
 
     <!-- Device ID -->
     <div class="form-group row">
         <label for="device_id" class="col-sm-2 col-form-label">Device ID</label>
         <div class="col-sm-10">
-            <input type="text" class="form-control" id="device_id" value="">
+            <input type="text" class="form-control" id="device_id" name="device_id" value="">
         </div>
     </div>
 
@@ -18,24 +29,24 @@
     <div class="form-group row">
         <label for="device_name" class="col-sm-2 col-form-label">Device Name</label>
         <div class="col-sm-10">
-            <input type="text" class="form-control" id="device_name" value="">
+            <input type="text" class="form-control" id="device_name" name="device_name" value="">
         </div>
     </div>
 
     <!-- Device GPS Location -->
-    <span>
+    <label class="col-form-label">
         GPS Location Coordinates
-    </span>
+    </label>
     <div class="form-group row">
         <label for="latitude" class="col-sm-2 col-form-label">Latitude</label>
         <div class="col-sm-10">
-            <input type="text" class="form-control" id="latitude" value="">
+            <input type="text" class="form-control" id="latitude" name="latitude" value="">
         </div>
     </div>
     <div class="form-group row">
         <label for="longitude" class="col-sm-2 col-form-label">Longitude</label>
         <div class="col-sm-10">
-            <input type="text" class="form-control" id="longitude" value="">
+            <input type="text" class="form-control" id="longitude" name="longitude" value="">
         </div>
     </div>
 
@@ -43,4 +54,5 @@
     <button type="submit" class="btn btn-primary right">Submit</button>
 </form>
 
+</div>
 {% endblock %}
