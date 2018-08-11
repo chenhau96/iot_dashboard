@@ -1,9 +1,8 @@
 from django.shortcuts import render
 from django.urls import reverse
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from datetime import timedelta
 import datetime
-import json
 
 from dashboard.models import Devices, Device
 from dashboard.selectionItems import *
@@ -110,29 +109,168 @@ def is_which_data_valid(dev_id, which_data):
 
 
 def devices_management(request):
-    # TODO: navigate to devices page
-    # Get distinct device_id devices
-    devices = Devices.objects.order_by('device_id').distinct('device_id')
-    print(len(devices))
+    """
+    Display list of devices in a table
+    :param request:
+    :return:
+    """
+    # Get all devices order by device ID
+    devices = Device.objects.order_by('device_id')
+
     return render(request, 'dashboard/device_management.html', {
         'devices': devices,
     })
 
 
-def device_form(request):
+def add_device(request):
     """
-    Device Add/Update Form Page
+    Add new device function
+    It handles both GET and POST request
     :param request:
     :return:
     """
-    return render(request, 'dashboard/device_form.html')
+    if request.method == 'GET':
+        # GET request
+        # display the form
+        return render(request, 'dashboard/add_device.html')
+
+    elif request.method == 'POST':
+        # POST request
+        # process the form data
+
+        hasError = False
+        error_message = ""
+
+        # Get the POST data and create a new device object
+        newDevice = Device(device_id=request.POST['device_id'])
+        newDevice.device_name = request.POST['device_name']
+        latitude = request.POST['latitude']
+        longitude = request.POST['longitude']
+
+        if latitude and longitude:
+            # Set gps_loc if latitude and longitude field is not empty
+            newDevice.gps_loc = [float(latitude), float(longitude)]
+
+        # Validation
+        if newDevice.device_id == "":
+            # If device ID field is empty
+            hasError = True
+            error_message = "Device ID cannot be empty."
+        else:
+            # Check if new device id and name exist in database
+            isExist = Device.objects(device_id=newDevice.device_id)
+
+            if isExist:
+                hasError = True
+                error_message = "This Device ID or Name has been used."
+
+        if hasError:
+            # If error occurs, return error message
+            return render(request, 'dashboard/add_device.html', {
+                'error_message': error_message
+            })
+        else:
+            # Save the newly created device object
+            newDevice.save()
+
+        # Redirect to device management page
+        return HttpResponseRedirect(reverse('dashboard:devices_management'))
 
 
-def add_update_device(request):
-    newDevice = Device(device_id=request.POST['device_id'])
-    newDevice.device_name = request.POST['device_name']
-    newDevice.gps_loc = request.POST['gps']
-    newDevice.save()
+def update_device(request, dev_id):
+    """
+    Update existing device function
+    It handles both GET and POST request
+    :param request:
+    :param dev_id:
+    :return:
+    """
+    # Query the device using device ID
+    device = Device.objects(device_id=dev_id)[0]
+
+    if device is None:
+        # If the device ID not found, raise Http404
+        raise Http404("Device ID \"" + dev_id + "\" does not exist")
+    else:
+        # If device ID exists, check if a GET/POST request
+        if request.method == 'GET':
+            # GET request
+            # display the form
+            return render(request, 'dashboard/update_device.html', {
+                'device': device
+            })
+        elif request.method == 'POST':
+            # POST request
+            # process the form data
+
+            hasError = False
+            error_message = ""
+
+            # Get the POST data
+            device_id = request.POST['device_id']
+            device_name = request.POST['device_name']
+            latitude = request.POST['latitude']
+            longitude = request.POST['longitude']
+            gps_loc = None
+
+            if latitude and longitude:
+                # Set gps_loc if latitude and longitude field is not empty
+                gps_loc = [float(latitude), float(longitude)]
+
+            # Validation
+            if device_id == "":
+                # If device ID field is empty
+                hasError = True
+                error_message = "Device ID cannot be empty."
+            elif device_id != dev_id:
+                # Check if changed device id and name exist in database
+                isExist = Device.objects(device_id=device_id)
+
+                if isExist:
+                    hasError = True
+                    error_message = "This Device ID or Name has been used."
+
+            if hasError:
+                # If error occurs, return error message
+                return render(request, 'dashboard/update_device.html', {
+                    'device': device,
+                    'error_message': error_message
+                })
+            else:
+                # Update document
+                if device_id == dev_id:
+                    Device.objects(device_id=dev_id).update_one(
+                        set__device_name=device_name,
+                        set__gps_loc=gps_loc,
+                    )
+                else:
+                    Device.objects(device_id=dev_id).update_one(
+                        set__device_id=device_id,
+                        set__device_name=device_name,
+                        set__gps_loc=gps_loc,
+                    )
+
+                device.reload()
+
+            # Redirect to device management page
+            return HttpResponseRedirect(reverse('dashboard:devices_management'))
+
+
+def delete_device(request, dev_id):
+    """
+    View function to delete device
+    :param request:
+    :param dev_id:
+    :return:
+    """
+    device = Device.objects(device_id=dev_id)
+
+    if device:
+        device.delete()
+    else:
+        error = "device not found"
+
+    return HttpResponseRedirect(reverse('dashboard:devices_management'))
 
 # For temporary use
 def max_vs_min_view(request):

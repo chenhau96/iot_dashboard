@@ -15,13 +15,20 @@ urlpatterns = [
     path('device/<slug:dev_id>/<slug:which_data>/',
          views.chart_detail, name='chart_detail'),
 
-    # TODO:
     # Device Management Page
-    path('devices/management', views.devices_management, name='devices_management'),
+    path('devices/management', views.devices_management,
+         name='devices_management'),
 
-    # Device Add/Update Form Page
-    path('devices/management/form', views.device_form, name='device_form'),
+    # Add Device
+    path('devices/management/add', views.add_device, name='add_device'),
 
+    # Update Device
+    path('devices/management/edit/<slug:dev_id>', views.update_device,
+         name='update_device'),
+
+    # Delete Device
+    path('devices/management/delete/<slug:dev_id>', views.delete_device,
+         name='delete_device'),
 
     # For temporary use
     path('max_vs_min_view/', views.max_vs_min_view, name='max_vs_min_view'),

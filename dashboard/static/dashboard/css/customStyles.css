@@ -6,10 +6,15 @@
   float: left;
 }
 
-.offline {
-  color: red;
+.form-margin {
+  margin: 2% 2%;
 }
 
-.online {
-  color: green;
+.form-label-margin {
+  margin: 20px 0;
+}
+
+.custom-btn-size {
+  width: 42%;
+  margin: 1% 3%;
 }

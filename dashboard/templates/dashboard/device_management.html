@@ -8,46 +8,43 @@
     <div class="card-header">
         <h3 class="left">Devices</h3>
         <a class="btn btn-primary right"
-            href="{% url 'dashboard:device_form' %}">Add</a>
+            href="{% url 'dashboard:add_device' %}">Add</a>
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                <thead>
+            <table class="table table-bordered table-hover" width="100%" cellspacing="0">
+                <thead class="thead-light">
                     <tr>
-                        <th>Name</th>
-                        <th>GPS Location</th>
-                        <th>Status</th>
-                        <th>Action</th>
+                        <th class="text-center" style="width: 20%">Device ID</th>
+                        <th class="text-center" style="width: 25%">Device Name</th>
+                        <th class="text-center" style="width: 20%">GPS Location</th>
+                        <th class="text-center" style="width: 10%">Status</th>
+                        <th class="text-center" style="width: 15%">Action</th>
                     </tr>
                 </thead>
 
                 <tbody>
+                    {% for device in devices %}
                     <tr>
-                        <td>Devices 1</td>
-                        <td>LoRa</td>
-                        <td style="color:#52BE80">Online</td>
+                        <td>{{ device.device_id }}</td>
+                        <td>{{ device.device_name|title }}</td>
+                        <td>
+                            <b>Lat:</b> {{ device.gps_loc.0 }}</br>
+                            <b>Long:</b> {{ device.gps_loc.1 }}
+                        </td>
+                        {% if device.status == "online" %}
+                            <td class="text-success text-center">{{ device.status|title }}</td>
+                        {% else %}
+                            <td class="text-danger text-center">{{ device.status|title }}</td>
+                        {% endif %}
+                        <td>
+                            <a class="btn btn-primary btn-sm custom-btn-size"
+                               href="{% url 'dashboard:update_device' device.device_id %}" role="button">Edit</a>
+                            <a class="btn btn-danger btn-sm custom-btn-size"
+                               href="{% url 'dashboard:delete_device' device.device_id %}" role="button">Delete</a>
+                        </td>
                     </tr>
-                    <tr>
-                        <td>Devices 2</td>
-                        <td>Wifi</td>
-                        <td style="color:#52BE80">Online</td>
-                    </tr>
-                    <tr>
-                        <td>Devices 3</td>
-                        <td>SigFox</td>
-                        <td style="color:#52BE80">Online</td>
-                    </tr>
-                    <tr>
-                        <td>Devices 4</td>
-                        <td>Zigbee</td>
-                        <td style="color:#52BE80">Online</td>
-                    </tr>
-                    <tr>
-                        <td>Devices 5</td>
-                        <td>LoRa</td>
-                        <td style="color:red">Offline</td>
-                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>

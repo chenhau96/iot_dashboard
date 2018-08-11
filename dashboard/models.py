@@ -29,7 +29,7 @@ class ChartConfig(EmbeddedDocument):
 
 class Device(Document):
     owner = ReferenceField(Users)
-    device_id = StringField(max_length=30, required=True)
+    device_id = StringField(max_length=30, required=True, unique_with='device_name')
     device_name = StringField(max_length=30)
     gps_loc = GeoPointField()
     status = StringField(default="offline")
