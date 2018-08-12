@@ -1,5 +1,9 @@
 {% load static %}
 
+{% load tags %}
+
+{% device_objects request as devices %}
+
 <html lang="en">
 
 <head>
@@ -57,15 +61,14 @@
                         <li>
                             <a href="{% url 'dashboard:index' %}">Main Dashboard</a>
                         </li>
-                        <!--
-                        A for loop will be here later to loop through devices
-                        -->
+
+                        {% for device in devices %}
                         <li>
-                            <a href="{% url 'dashboard:device' dev_id="00-80-00-00-00-01-1e-d7" %}">Device 1</a>
+                            <a href="{% url 'dashboard:device' dev_id=device.device_id %}">
+                                {{ device.device_name}}
+                            </a>
                         </li>
-                        <li>
-                            <a href="{% url 'dashboard:device' dev_id="00-80-00-00-00-01-1e-d7" %}">Device 2</a>
-                        </li>
+                        {% endfor %}
                     </ul>
                 </li>
                 <li>

@@ -11,12 +11,12 @@ from rest_framework_mongoengine import viewsets
 from dashboard.serializers import DevicesSerializer
 
 
+
+
 def index(request):
     """
     Main dashboard
     """
-    # TODO: index page
-    # pass
     return render(request, 'dashboard/index.html')
 
 
@@ -29,20 +29,17 @@ def device(request, dev_id):
     :param dev_id: device id
     :return:
     """
+    # Get all devices for side navigation's dashboard category
+    devices = Device.objects.all()
 
-    devices = Devices.objects(device_id=dev_id)
-
-    if not is_device_id_valid(dev_id):
+    current_device = Device.objects(device_id=dev_id)
+    if current_device is None:
         # if device_id not found, raise Http404
         raise Http404("Device ID \"" + dev_id + "\" does not exist")
     else:
         # if device_id is found, render the page
         return render(request, 'dashboard/device_dashboard.html',
-                      {
-                          'devices': devices,
-                          'device_id': dev_id,
-                          'data_count': len(devices[0].data),
-                      })
+                      {'device_id': dev_id, })
 
 
 def chart_detail(request, dev_id, which_data):
