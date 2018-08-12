@@ -4,13 +4,11 @@ from django.http import Http404, HttpResponseRedirect
 from datetime import timedelta
 import datetime
 
-from dashboard.models import Devices, Device
+from dashboard.models import Devices, Device, ChartConfig
 from dashboard.selectionItems import *
 
 from rest_framework_mongoengine import viewsets
 from dashboard.serializers import DevicesSerializer
-
-
 
 
 def index(request):
@@ -29,11 +27,8 @@ def device(request, dev_id):
     :param dev_id: device id
     :return:
     """
-    # Get all devices for side navigation's dashboard category
-    devices = Device.objects.all()
-
     current_device = Device.objects(device_id=dev_id)
-    if current_device is None:
+    if not current_device:
         # if device_id not found, raise Http404
         raise Http404("Device ID \"" + dev_id + "\" does not exist")
     else:
@@ -53,8 +48,9 @@ def chart_detail(request, dev_id, which_data):
     :param which_data: data field of a device
     :return:
     """
+    current_device = Device.objects(device_id=dev_id)[0]
 
-    if not is_device_id_valid(dev_id):
+    if not current_device:
         # if device_id not found, raise Http404
         raise Http404("Device ID \"" + dev_id + "\" does not exist")
     elif not is_which_data_valid(dev_id, which_data):
@@ -69,23 +65,6 @@ def chart_detail(request, dev_id, which_data):
                           'chartTypeList': chartTypeList,
                           'timelineList': timelineList,
                       })
-
-
-def is_device_id_valid(dev_id):
-    """
-    Check whether device id is valid (exists in database)
-
-    :param dev_id: device id
-    :return: valid
-    """
-    valid = False
-
-    devices_documents = Devices.objects(device_id=dev_id)
-
-    if len(devices_documents) > 0:
-        valid = True
-
-    return valid
 
 
 def is_which_data_valid(dev_id, which_data):
@@ -147,6 +126,10 @@ def add_device(request):
         if latitude and longitude:
             # Set gps_loc if latitude and longitude field is not empty
             newDevice.gps_loc = [float(latitude), float(longitude)]
+
+        # Create a default chart configuration object
+        chart_config = ChartConfig(show_in_main=False)
+        newDevice.default_config = chart_config
 
         # Validation
         if newDevice.device_id == "":
@@ -268,6 +251,35 @@ def delete_device(request, dev_id):
         error = "device not found"
 
     return HttpResponseRedirect(reverse('dashboard:devices_management'))
+
+
+def save_chart_config(request, dev_id, which_data):
+    if request.method == 'POST':
+        # Get the device object
+        device = Device.objects(device_id=dev_id).first()
+
+        # Get POST data
+        threshold = request.POST['threshold']
+        color = request.POST['color']
+        chart_type = request.POST['chart_type']
+        timeline = request.POST['timeline']
+
+        # Create a ChartConfig object
+        chart_config = ChartConfig(
+            threshold=threshold,
+            color=color,
+            chart_type=chart_type,
+            timeline=timeline,
+        )
+
+        # Add/Update the configuration of which_data (Eg: Temperature)
+        device[which_data] = chart_config
+        device.save()
+
+        return HttpResponseRedirect(
+            reverse('dashboard:chart_detail',
+                    kwargs={'dev_id': dev_id, 'which_data': which_data}))
+
 
 # For temporary use
 def max_vs_min_view(request):

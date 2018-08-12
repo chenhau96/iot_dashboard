@@ -52,14 +52,14 @@
             </div>
 
             <ul class="list-unstyled components">
-                <li>
-                    <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                <li class="active">
+                    <a href="#dashboard-list" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
                         <i class="fa fa-tachometer icon-margin"></i>
                         Dashboard
                     </a>
-                    <ul class="collapse list-unstyled" id="homeSubmenu">
+                    <ul class="collapse list-unstyled" id="dashboard-list">
                         <li>
-                            <a href="{% url 'dashboard:index' %}">Main Dashboard</a>
+                            <b><a href="{% url 'dashboard:index' %}">Main Dashboard</a></b>
                         </li>
 
                         {% for device in devices %}

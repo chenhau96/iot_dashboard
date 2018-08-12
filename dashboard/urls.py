@@ -9,10 +9,10 @@ urlpatterns = [
 
     # Individual Device Dashboard
     # Param: String dev_id
-    path('device/<slug:dev_id>/', views.device, name='device'),
+    path('device/<slug:dev_id>', views.device, name='device'),
 
     # Single Chart Page
-    path('device/<slug:dev_id>/<slug:which_data>/',
+    path('device/<slug:dev_id>/<slug:which_data>',
          views.chart_detail, name='chart_detail'),
 
     # Device Management Page
@@ -29,6 +29,11 @@ urlpatterns = [
     # Delete Device
     path('devices/management/delete/<slug:dev_id>', views.delete_device,
          name='delete_device'),
+
+    # Save Chart Configuration
+    path('device/<slug:dev_id>/<slug:which_data>/save', views.save_chart_config,
+         name='save_chart_config'),
+
 
     # For temporary use
     path('max_vs_min_view/', views.max_vs_min_view, name='max_vs_min_view'),

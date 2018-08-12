@@ -1,5 +1,5 @@
 <h5>Preferences</h5>
-<form action="#">
+<form action="{% url 'dashboard:save_chart_config' device_id whichData %}" method="post">
     {% csrf_token %}
     <div class="form-row form-inline">
         <!-- Threshold -->
@@ -12,8 +12,8 @@
 
         <!-- Color -->
         <div class="form-inline col-auto">
-            <label for="colors">Color: </label>
-            <select id="colors" name="colors" class="form-control margin-10"
+            <label for="color">Color: </label>
+            <select id="color" name="color" class="form-control margin-10"
                     onchange="changeColor(event)">
                 {% for color in colorList %}
                     <option value="{{ color|cut:" " }}">{{ color|title }}</option>
@@ -23,8 +23,8 @@
 
         <!-- Chart Type -->
         <div class="form-inline col-auto">
-            <label for="charts-type">Chart Type: </label>
-            <select id="charts-type" name="charts-type" class="form-control margin-10">
+            <label for="chart_type">Chart Type: </label>
+            <select id="chart_type" name="chart_type" class="form-control margin-10">
                 {% for chartType in chartTypeList %}
                     <option value="{{ chartType|cut:" " }}">{{ chartType|title }}</option>
                 {% endfor %}
@@ -33,8 +33,8 @@
 
         <!-- Timeline -->
         <div class="form-inline col-auto">
-            <label for="datetime">Timeline: </label>
-            <select id="datetime" name="datetime" class="form-control margin-10"
+            <label for="timeline">Timeline: </label>
+            <select id="timeline" name="timeline" class="form-control margin-10"
                     onchange="changeTimeline(event)">
                 {% for timeline in timelineList %}
                     <option value="{{ timeline|cut:" " }}">{{ timeline|title }}</option>

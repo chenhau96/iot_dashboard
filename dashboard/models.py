@@ -25,15 +25,16 @@ class ChartConfig(EmbeddedDocument):
     color = StringField(default="steelblue")
     chart_type = StringField(default="lineChart")
     timeline = StringField(default="today")
+    show_in_main = BooleanField(default=False)
 
 
-class Device(Document):
+class Device(DynamicDocument):
     owner = ReferenceField(Users)
-    device_id = StringField(max_length=30, required=True, unique_with='device_name')
+    device_id = StringField(max_length=30, required=True)
     device_name = StringField(max_length=30)
     gps_loc = GeoPointField()
     status = StringField(default="offline")
-    chart_config = ListField(EmbeddedDocumentField(ChartConfig))
+    default_config = EmbeddedDocumentField(ChartConfig)
 
 
 

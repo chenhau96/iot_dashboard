@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
   d3.select(".chart-title").text(chartTitle);
 
   // Set color to saved config value
-  var color = document.getElementById("colors");
+  var color = document.getElementById("color");
   color.value = chart_config.color;
 
   // Fetch data from API
@@ -193,7 +193,7 @@ function changeColor(e) {
 
 // Change timeline function
 function changeTimeline(e) {
-  // Get value from timeline drop down lsit
+  // Get value from timeline drop down list
   var timeline = e.target.value;
 
   // Set new API call to retrieve new set of data
