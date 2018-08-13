@@ -48,9 +48,20 @@ def chart_detail(request, dev_id, which_data):
     :param which_data: data field of a device
     :return:
     """
-    current_device = Device.objects(device_id=dev_id)[0]
+    device = Device.objects(device_id=dev_id)[0]
 
-    if not current_device:
+    # Set default chart configuration
+    dev_config = device.default_config
+
+    # Retrieve the chart configuration for the particular data
+    # If exists, replace default chart configuration
+    for item in device.chart_config:
+        field = ''.join(item.keys())    # Get dictionary key
+        if which_data == field:
+            dev_config = item[field]
+            break
+
+    if not device:
         # if device_id not found, raise Http404
         raise Http404("Device ID \"" + dev_id + "\" does not exist")
     elif not is_which_data_valid(dev_id, which_data):
@@ -59,6 +70,7 @@ def chart_detail(request, dev_id, which_data):
         # if device_id is found, render the page
         return render(request, 'dashboard/chart_detail.html',
                       {
+                          'dev_config': dev_config,
                           'device_id': dev_id,
                           'whichData': which_data,
                           'colorList': colorList,
@@ -273,7 +285,8 @@ def save_chart_config(request, dev_id, which_data):
         )
 
         # Add/Update the configuration of which_data (Eg: Temperature)
-        device[which_data] = chart_config
+        # device[which_data] = chart_config
+        device.chart_config.append({which_data: chart_config})
         device.save()
 
         return HttpResponseRedirect(
@@ -314,6 +327,7 @@ class DevicesViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         # Get all device objects order by timestamp
         queryset = Devices.objects.order_by('timestamp')
+        queryset_copy = Devices.objects.order_by('timestamp')
 
         # Get device_id, timestamp, data in API request parameter
         device_id = self.request.query_params.get('device_id', None)
@@ -343,16 +357,16 @@ class DevicesViewSet(viewsets.ModelViewSet):
             # Check timestamp parameter value to do filter accordingly
             if timestamp == 'today':
                 queryset = queryset.filter(timestamp__gte=today)
-            elif timestamp == 'last3day':
+            elif timestamp == 'last3Days':
                 last3day = today - timedelta(days=3)
                 queryset = queryset.filter(timestamp__gte=last3day)
-            elif timestamp == 'last7day':
+            elif timestamp == 'last7Days':
                 last7day = today - timedelta(days=7)
                 queryset = queryset.filter(timestamp__gte=last7day)
-            elif timestamp == 'this-month':
+            elif timestamp == 'thisMonth':
                 this_month = today - timedelta(days=30)
                 queryset = queryset.filter(timestamp__gte=this_month)
-            elif timestamp == 'this-year':
+            elif timestamp == 'thisYear':
                 this_year = today - timedelta(days=365)
                 queryset = queryset.filter(timestamp__gte=this_year)
 
@@ -365,11 +379,10 @@ class DevicesViewSet(viewsets.ModelViewSet):
             """
 
             # Check if 'data' param is a valid datafield in the queryset
-            for datafield in queryset[0].data:
-                if datafield == data:
-                    # Return queryset if 'data' param is valid
-                    return queryset\
-                        .only('device_id', 'timestamp', 'data__'+data)
+            if data in queryset_copy[0].data:
+                # Return queryset if 'data' param is valid
+                return queryset\
+                    .only('device_id', 'timestamp', 'data__'+data)
 
             # Set queryset to none if 'data' param is invalid
             queryset = None

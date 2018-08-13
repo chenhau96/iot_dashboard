@@ -6,6 +6,16 @@
 <script>
     var device_id = "{{ device_id }}";
     var whichData = "{{ whichData }}";
+
+    var chart_config = {};
+    chart_config = {
+        threshold: {{ dev_config.threshold }},
+        color: "{{ dev_config.color }}",
+        chart_type: "{{ dev_config.chart_type }}",
+        timeline: "{{ dev_config.timeline }}",
+        showInMain: true ? "{{ dev_config.show_in_main }}" == "True" : false,
+    };
+
 </script>
 <script src="{% static 'dashboard/scripts/drawCharts.js' %}"></script>
 
@@ -24,16 +34,7 @@
                                name="isIncluded" value="{{ whichData }}"
                                onchange="isChecked(this)">
                         <label class="form-check-label">Show in Main Dashboard</label>
-
                     </div>
-
-                    <!--
-                    <label style="float: right" class="switch">
-                      <input type="checkbox">
-                      <span class="slider round"></span>
-                    </label>
-                    <label style="float: right">Show in Main Dashboard</label>
-                    -->
                 </div>
                 <div class="card-body">
                     <svg></svg>

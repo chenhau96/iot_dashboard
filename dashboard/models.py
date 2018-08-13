@@ -23,7 +23,7 @@ class Users(Document):
 class ChartConfig(EmbeddedDocument):
     threshold = DecimalField(default=0.0)
     color = StringField(default="steelblue")
-    chart_type = StringField(default="lineChart")
+    chart_type = StringField(default="linechart")
     timeline = StringField(default="today")
     show_in_main = BooleanField(default=False)
 
@@ -35,6 +35,7 @@ class Device(DynamicDocument):
     gps_loc = GeoPointField()
     status = StringField(default="offline")
     default_config = EmbeddedDocumentField(ChartConfig)
+    chart_config = ListField(MapField(EmbeddedDocumentField(ChartConfig)))
 
 
 

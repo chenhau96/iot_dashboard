@@ -1,19 +1,12 @@
 
-var chart_config = {
-  threshold: 30,
-  color: "steelblue",
-  chartType: "lineChart",
-  timeline: "last3Days",
-  includeInMain: false,
-};
-
 var parsedData;
 var chartTitle = "";
 var ttFormatTime = d3.timeFormat("%d-%m-%Y %X");
 var iconCels = "\u2103";  // Celsius icon
 var updateFlag = false;
-var updateInterval = 60000; // 30s
+var updateInterval = 3000000; // 30s
 var transitionDuration = 1000; // 750ms
+
 
 // Chart width and height setting
 var svgWidth = 650, svgHeight = 400;
@@ -27,16 +20,21 @@ var height_mid = height / 2;
 var api = 'http://localhost:8000/api/devices/?device_id=' + device_id +
           '&data=' + whichData;
 
-// After everything is loaded
+// After everything (HTML elements) is loaded
 document.addEventListener("DOMContentLoaded", function(event) {
+
+  setPreferenceValue()
+
+  var api = 'http://localhost:8000/api/devices/?device_id=' + device_id +
+          '&data=' + whichData + '&timestamp=' + chart_config.timeline;
+
+  console.log(api);
+
+
   // Make first letter of each data uppercase, to become the chart title
   var firstLetterUpper = whichData.charAt(0).toUpperCase();
   chartTitle = firstLetterUpper + whichData.substr(1);
   d3.select(".chart-title").text(chartTitle);
-
-  // Set color to saved config value
-  var color = document.getElementById("color");
-  color.value = chart_config.color;
 
   // Fetch data from API
   fetchDataFromAPI(api);
@@ -182,6 +180,20 @@ function drawLineChart(data) {
     });
 }
 
+// Set saved preferences value
+function setPreferenceValue() {
+  setValue("threshold", chart_config.threshold);
+  setValue("color", chart_config.color);
+  setValue("chart_type", chart_config.chart_type);
+  setValue("timeline", chart_config.timeline);
+}
+
+// Set form value
+function setValue(id, value) {
+    var element = document.getElementById(id);
+    element.value = value;
+}
+
 // Change color function
 function changeColor(e) {
   // Get value from color drop down list
@@ -196,22 +208,8 @@ function changeTimeline(e) {
   // Get value from timeline drop down list
   var timeline = e.target.value;
 
-  // Set new API call to retrieve new set of data
-  if (timeline == "today") {
-    api = 'http://localhost:8000/api/devices/?timestamp=today';
-  }
-  else if (timeline == "last3Days") {
-    api = 'http://localhost:8000/api/devices/?timestamp=last3day';
-  }
-  else if (timeline == "last7Days") {
-    api = 'http://localhost:8000/api/devices/?timestamp=last7day';
-  }
-  else if (timeline == "thisMonth") {
-    api = 'http://localhost:8000/api/devices/?timestamp=this-month';
-  }
-  else if (timeline == "thisYear") {
-    api = 'http://localhost:8000/api/devices/?timestamp=this-year';
-  }
+  api = 'http://localhost:8000/api/devices/?device_id=' + device_id +
+          '&data=' + whichData + '&timestamp=' + timeline;
 
   // Fetch data from new API
   fetchDataFromAPI(api);
@@ -230,7 +228,7 @@ function changeThreshold(e) {
     });
 }
 
-  var included = [];  // Array for storing checkboxes value
+var included = [];  // Array for storing checkboxes value
 
 function isChecked(checkbox) {
   /*var isIncludedCb = document.getElementsByName("isIncluded");
