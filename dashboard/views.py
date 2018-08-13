@@ -51,15 +51,7 @@ def chart_detail(request, dev_id, which_data):
     device = Device.objects(device_id=dev_id)[0]
 
     # Set default chart configuration
-    dev_config = device.default_config
-
-    # Retrieve the chart configuration for the particular data
-    # If exists, replace default chart configuration
-    for item in device.chart_config:
-        field = ''.join(item.keys())    # Get dictionary key
-        if which_data == field:
-            dev_config = item[field]
-            break
+    dev_config = get_chart_config(device, which_data)
 
     if not device:
         # if device_id not found, raise Http404
@@ -78,6 +70,20 @@ def chart_detail(request, dev_id, which_data):
                           'timelineList': timelineList,
                       })
 
+
+def get_chart_config(device, which_data):
+    # Set default chart configuration
+    dev_config = device.default_config
+
+    # Retrieve the chart configuration for the particular data
+    # If exists, replace default chart configuration
+    for item in device.chart_config:
+        field = ''.join(item.keys())  # Get dictionary key
+        if which_data == field:
+            dev_config = item[field]
+            break
+
+    return dev_config
 
 def is_which_data_valid(dev_id, which_data):
     """
@@ -275,6 +281,8 @@ def save_chart_config(request, dev_id, which_data):
         color = request.POST['color']
         chart_type = request.POST['chart_type']
         timeline = request.POST['timeline']
+        #show_in_main = request.POST['show_in_main']
+        #print('Value of show_in_main', show_in_main)
 
         # Create a ChartConfig object
         chart_config = ChartConfig(
@@ -282,36 +290,31 @@ def save_chart_config(request, dev_id, which_data):
             color=color,
             chart_type=chart_type,
             timeline=timeline,
+            show_in_main=False,
         )
 
-        # Add/Update the configuration of which_data (Eg: Temperature)
-        # device[which_data] = chart_config
-        device.chart_config.append({which_data: chart_config})
+        # Check if the chart config for which_data is exists
+        isExist = False
+
+        for i, item in enumerate(device.chart_config):
+            field = ''.join(item.keys())  # Get dictionary key
+            if which_data == field:
+                # If exists, update the values
+                isExist = True
+                device.chart_config[i][field] = chart_config
+                break
+
+        if not isExist:
+            # If chart configuration of which_data does not exists,
+            # Add the configuration of which_data (Eg: Temperature)
+            device.chart_config.append({which_data: chart_config})
+
+        # Save the document
         device.save()
 
         return HttpResponseRedirect(
             reverse('dashboard:chart_detail',
                     kwargs={'dev_id': dev_id, 'which_data': which_data}))
-
-
-# For temporary use
-def max_vs_min_view(request):
-    return render(request, 'dashboard/chart_detail.html')
-
-def avg_temp(request):
-    return render(request, 'dashboard/avg-temp.html')
-
-def snowView(request):
-    return render(request, 'dashboard/snowView.html')
-
-def precipitationView(request):
-    return render(request, 'dashboard/precipitationView.html')
-
-def mapView(request):
-    return render(request, 'dashboard/mapView.html')
-
-def device_table(request):
-    return render(request, 'dashboard/device_management.html')
 
 
 class DevicesViewSet(viewsets.ModelViewSet):
@@ -390,6 +393,24 @@ class DevicesViewSet(viewsets.ModelViewSet):
         return queryset
 
 
+# For temporary use
+def max_vs_min_view(request):
+    return render(request, 'dashboard/chart_detail.html')
+
+def avg_temp(request):
+    return render(request, 'dashboard/avg-temp.html')
+
+def snowView(request):
+    return render(request, 'dashboard/snowView.html')
+
+def precipitationView(request):
+    return render(request, 'dashboard/precipitationView.html')
+
+def mapView(request):
+    return render(request, 'dashboard/mapView.html')
+
+def device_table(request):
+    return render(request, 'dashboard/device_management.html')
 
 
 

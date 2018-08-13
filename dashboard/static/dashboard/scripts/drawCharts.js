@@ -28,9 +28,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
   var api = 'http://localhost:8000/api/devices/?device_id=' + device_id +
           '&data=' + whichData + '&timestamp=' + chart_config.timeline;
 
-  console.log(api);
-
-
   // Make first letter of each data uppercase, to become the chart title
   var firstLetterUpper = whichData.charAt(0).toUpperCase();
   chartTitle = firstLetterUpper + whichData.substr(1);

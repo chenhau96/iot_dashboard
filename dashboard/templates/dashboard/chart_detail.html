@@ -30,10 +30,12 @@
                 <div class="card-header">
                     <h6 class="chart-title"></h6>
                     <div class="form-check show-in-main">
-                        <input class="form-check-input" type="checkbox"
-                               name="isIncluded" value="{{ whichData }}"
-                               onchange="isChecked(this)">
-                        <label class="form-check-label">Show in Main Dashboard</label>
+                        <form action="{% url 'dashboard:save_chart_config' device_id whichData %}" method="post">
+                            <input class="form-check-input" type="checkbox"
+                                   name="show_in_main" value="{{ whichData }}"
+                                   onchange="isChecked(this)">
+                            <label class="form-check-label">Show in Main Dashboard</label>
+                        </form>
                     </div>
                 </div>
                 <div class="card-body">
