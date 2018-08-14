@@ -24,7 +24,8 @@
         <!-- Chart Type -->
         <div class="form-inline col-auto">
             <label for="chart_type">Chart Type: </label>
-            <select id="chart_type" name="chart_type" class="form-control margin-10">
+            <select id="chart_type" name="chart_type" class="form-control margin-10"
+                    onchange="changeChartType(event)">
                 {% for chartType in chartTypeList %}
                     <option value="{{ chartType|cut:" " }}">{{ chartType|title }}</option>
                 {% endfor %}

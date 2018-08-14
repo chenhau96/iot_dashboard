@@ -4,9 +4,9 @@ var chartTitle = "";
 var ttFormatTime = d3.timeFormat("%d-%m-%Y %X");
 var iconCels = "\u2103";  // Celsius icon
 var updateFlag = false;
-var updateInterval = 3000000; // 30s
+var updateInterval = 30000; // 30s
 var transitionDuration = 1000; // 1000ms
-
+var red = "#e60000", blue = "#000066";  // color hex code
 
 // Chart width and height setting
 var svgWidth = 650, svgHeight = 400;
@@ -18,7 +18,7 @@ var height_mid = height / 2;
 
 // API URL
 var api = 'http://localhost:8000/api/devices/?device_id=' + device_id +
-          '&data=' + whichData;
+        '&data=' + whichData + '&timestamp=' + chart_config.timeline;
 
 // After everything (HTML elements) is loaded
 document.addEventListener("DOMContentLoaded", function(event) {
@@ -30,10 +30,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
   var checkbox = document.getElementById("show_in_main");
   if (chart_config.show_in_main)
     checkbox.checked = true;
-
-  // API URL
-  var api = 'http://localhost:8000/api/devices/?device_id=' + device_id +
-          '&data=' + whichData + '&timestamp=' + chart_config.timeline;
 
   // Make first letter of each data uppercase, to become the chart title
   var firstLetterUpper = whichData.charAt(0).toUpperCase();
@@ -62,11 +58,12 @@ function fetchDataFromAPI(api) {
         if (!updateFlag) {
           // First display of chart
           updateFlag = true;
-          drawLineChart(parsedData);
+
+          drawWhichChart(chart_config.chart_type, parsedData);
         }
         else {
           // After display the chart, update it every 5s
-          updateLineChart(parsedData);
+          updateWhichChart(chart_config.chart_type, parsedData);
         }
       }
     })
@@ -86,16 +83,50 @@ function parseData(apiData) {
     arr.push(
       {
         ts: localDateTime,
-        temperature: apiData[i].data[whichData],
+        data_point: apiData[i].data[whichData],
       }
     );
   }
   return arr;
 }
 
+
+/*
+ * Draw Charts Section
+ */
+
+// Function to process which chart type to draw
+function drawWhichChart(chart_type, data) {
+  switch(chart_type) {
+    case 'scatterplot':
+      drawScatterPlot(data);
+      break;
+    case 'linechart':
+    default:
+      drawLineChart(data);
+  }
+}
+
+// Function to process which chart type to draw
+function updateWhichChart(chart_type, data) {
+  switch(chart_type) {
+    case 'scatterplot':
+      updateScatterPlot(data);
+      break;
+    case 'linechart':
+    default:
+      updateLineChart(data);
+  }
+}
+
+// Line Chart
 function drawLineChart(data) {
+  // Remove existing svg if any
+  d3.select("svg").remove();
+
   // Set svg width and height
-  var svg = d3.select('svg')
+  var svg = d3.select("#chart-content")
+    .append("svg")
     .attr("width", svgWidth)
     .attr("height", svgHeight);
 
@@ -111,27 +142,28 @@ function drawLineChart(data) {
 
   // scale the range of y-axis
   var y = d3.scaleLinear()
-    .domain(d3.extent(data, function(d) { return d.temperature }))
-    //.domain([d3.min(data, function(d) { return d.temperature - 5}), d3.max(data, function(d) { return d.temperature + 5})])
+    .domain(d3.extent(data, function(d) { return d.data_point }))
     .range([height, 0]);
 
   // define x-axis
   var xAxis = d3.axisBottom(x)
-    .tickSize(-height)   // length of the each tick
-    .tickPadding(10);
+    .ticks(5)
+    .tickSize(8)   // length of the each tick
+    .tickPadding(5);
     //.ticks(d3.timeHour.every(24))
     //.tickFormat(d3.timeFormat("%m-%d"));
 
   // define y-axis
   var yAxis = d3.axisLeft(y)
-    .tickSize(-width)
-    .tickPadding(10);
+    .ticks(5)
+    .tickSize(8)
+    .tickPadding(5);
 
   // d3's line generator
   var line = d3.line()
     .curve(d3.curveLinear)
     .x(function(d) { return x(d.ts)})
-    .y(function(d) { return y(d.temperature)});
+    .y(function(d) { return y(d.data_point)});
 
   // append x-axis and label in a group tag
   g.append("g")
@@ -171,20 +203,42 @@ function drawLineChart(data) {
     .attr("stroke-width", 1.5)
     .attr("d", line(data));
 
+  // Add tooltip
+  var div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("display", "none")
+    .style("opacity", 0);
+
   // add data points to the line
   g.selectAll("circle").data(data).enter()
     .append("circle")
     .attr("class", "dotPoint")
     .attr("r", 4)
     .attr("cx", (d, i) => x(d.ts))
-    .attr("cy", (d, i) => y(d.temperature))
+    .attr("cy", (d, i) => y(d.data_point))
     .attr("fill", (d) => {
       // if beyond threshold, change data point's color to red
-      return (d.temperature >= 30) ? "#e60000" : " #000066";
+      return (d.data_point >= chart_config.threshold) ? red : blue;
+    })
+    // Tooltip mouseover
+    .on("mouseover", function(d) {
+      div.transition()
+        .duration(200)
+        .style("display", "inline")
+        .style("opacity", .9);
+      div.html(ttFormatTime(d.ts) + "<br/>" +
+        "<b>" + d.data_point.toFixed(2) + "</b>")
+          .style("left", (d3.event.pageX) + "px")
+          .style("top", (d3.event.pageY - 28) + "px");
+      })
+    .on("mouseout", function(d) {
+      div.transition()
+        .duration(500)
+        .style("opacity", 0);
     });
 }
 
-// Update line chart function
+// Update Line Chart
 function updateLineChart(data) {
   // Scale the x and y axis again
   var x = d3.scaleTime()
@@ -192,23 +246,25 @@ function updateLineChart(data) {
     .range([0, width]);
 
   var y = d3.scaleLinear()
-    .domain(d3.extent(data, function(d) { return d.temperature }))
+    .domain(d3.extent(data, function(d) { return d.data_point }))
     .range([height, 0]);
 
   // Define the x and y axis
   var xAxis = d3.axisBottom(x)
-    .tickSize(8);   // length of the each tick
-    //.ticks(d3.timeHour.every(24))
-    //.tickFormat(d3.timeFormat("%m-%d"));
+    .ticks(5)
+    .tickSize(8) // length of the each tick
+    .tickPadding(5);
 
   var yAxis = d3.axisLeft(y)
-    .tickSize(8);
+    .ticks(5)
+    .tickSize(8)
+    .tickPadding(5);
 
   // Generate the line
   var line = d3.line()
     .curve(d3.curveLinear)
     .x(function(d) { return x(d.ts)})
-    .y(function(d) { return y(d.temperature)});
+    .y(function(d) { return y(d.data_point)});
 
   var svg = d3.select("svg").transition();
   var path = d3.selectAll("path.line");
@@ -249,13 +305,19 @@ function updateLineChart(data) {
     .attr("class", "dotPoint")
     .attr("r", 4)
     .attr("cx", (d, i) => x(d.ts))
-    .attr("cy", (d, i) => y(d.temperature))
+    .attr("cy", (d, i) => y(d.data_point))
     .attr("fill", (d) => {
       // if beyond threshold, change data point's color to red
-      return (d.temperature >= 30) ? "#e60000" : " #000066";
+      return (d.data_point >= chart_config.threshold) ? red : blue;
     })
     .transition()
     .duration(transitionDuration);
+
+  // Add tooltip
+  var div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("display", "none")
+    .style("opacity", 0);
 
   // Create new data points, if there is new data
   d3.select(".chart").selectAll("circle").data(data)
@@ -264,10 +326,214 @@ function updateLineChart(data) {
     .attr("class", "dotPoint")
     .attr("r", 4)
     .attr("cx", (d, i) => x(d.ts))
-    .attr("cy", (d, i) => y(d.temperature))
+    .attr("cy", (d, i) => y(d.data_point))
     .attr("fill", (d) => {
       // if beyond threshold, change data point's color to red
-      return (d.temperature >= 30) ? "#e60000" : " #000066";
+      return (d.data_point >= chart_config.threshold) ? red : blue;
+    })
+    .on("mouseover", function(d) {
+      div.transition()
+        .duration(200)
+        .style("display", "inline")
+        .style("opacity", .9);
+      div.html(ttFormatTime(d.ts) + "<br/>" +
+        "<b>" + d.data_point.toFixed(2) + "</b>")
+          .style("left", (d3.event.pageX) + "px")
+          .style("top", (d3.event.pageY - 28) + "px");
+      })
+    .on("mouseout", function(d) {
+      div.transition()
+        .duration(500)
+        .style("opacity", 0);
+    });
+
+  // Remove old data points
+  d3.select(".chart").selectAll("circle")
+    .data(data)
+    .exit()
+    .remove();
+}
+
+// Scatterplot
+function drawScatterPlot(data) {
+  // Remove existing svg if any
+  d3.select("svg").remove();
+
+  var svg = d3.select("#chart-content")
+    .append("svg")
+    .attr("width", svgWidth)
+    .attr("height", svgHeight);
+
+  var chart = svg.append("g")
+    .attr("class", "chart")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  // scale the range of x-axis
+  var x = d3.scaleTime()
+    .domain(d3.extent(data, function(d) { return d.ts }))
+    .range([0, width]);
+
+  // scale the range of y-axis
+  var y = d3.scaleLinear()
+    .domain(d3.extent(data, function(d) { return d.data_point }))
+    .range([height, 0]);
+
+  // define x-axis
+  var xAxis = d3.axisBottom(x)
+    .ticks(5)
+    .tickSize(8)   // length of the each tick
+    .tickPadding(5);
+
+  // define y-axis
+  var yAxis = d3.axisLeft(y)
+    .ticks(5)
+    .tickSize(8)
+    .tickPadding(5);
+
+    // append x-axis and label in a group tag
+  chart.append("g")
+    .attr("class", "x-axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis)
+    .append("text")
+    .attr("class", "text-label")
+    .attr("fill", "#000")
+    .attr("transform", "translate(" + width_mid + ", " + 40 + ")")
+    .attr("text-anchor", "middle")
+    .text("Timeline");
+
+  // append y-axis and label in a group tag
+  chart.append("g")
+    .attr("class", "y-axis")
+    .call(yAxis)
+    .append("text")
+    .attr("class", "text-label")
+    .attr("fill", "#000")
+    .attr("x", 60 - height_mid)
+    .attr("y", 30 - margin.left)
+    .attr("transform", "rotate(-90)")
+    .attr("text-anchor", "end")
+    .text(() => {
+      if (chartTitle == "Temperature")
+        chartTitle += " " + iconCels;
+      return chartTitle;
+    });
+
+  // Add tooltip
+  var div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("display", "none")
+    .style("opacity", 0);
+
+  // add data points to the line
+  chart.selectAll("circle").data(data).enter()
+    .append("circle")
+    .attr("class", "dotPoint")
+    .attr("r", 4)
+    .attr("cx", (d, i) => x(d.ts))
+    .attr("cy", (d, i) => y(d.data_point))
+    .attr("fill", (d) => {
+      // if beyond threshold, change data point's color to red
+      return (d.data_point >= chart_config.threshold) ? red : blue;
+    })
+    // Tooltip mouseover
+    .on("mouseover", function(d) {
+      div.transition()
+        .duration(200)
+        .style("display", "inline")
+        .style("opacity", .9);
+      div.html(ttFormatTime(d.ts) + "<br/>" +
+        "<b>" + d.data_point.toFixed(2) + "</b>")
+          .style("left", (d3.event.pageX) + "px")
+          .style("top", (d3.event.pageY - 28) + "px");
+      })
+    .on("mouseout", function(d) {
+      div.transition()
+        .duration(500)
+        .style("opacity", 0);
+    });
+}
+
+// Update Scatterplot
+function updateScatterPlot(data) {
+  // Scale the x and y axis again
+  var x = d3.scaleTime()
+    .domain(d3.extent(data, function(d) { return d.ts }))
+    .range([0, width]);
+
+  var y = d3.scaleLinear()
+    .domain(d3.extent(data, function(d) { return d.data_point }))
+    .range([height, 0]);
+
+  // Define the x and y axis
+  var xAxis = d3.axisBottom(x)
+    .ticks(5)
+    .tickSize(8) // length of the each tick
+    .tickPadding(5);
+
+  var yAxis = d3.axisLeft(y)
+    .ticks(5)
+    .tickSize(8)
+    .tickPadding(5);
+
+  var svg = d3.select("svg").transition();
+
+    // Update the x-axis
+  svg.select(".x-axis")
+    .duration(transitionDuration)
+    .call(xAxis);
+
+  // Update the y-axis
+  svg.select(".y-axis")
+    .duration(transitionDuration)
+    .call(yAxis);
+
+  /** Update Circle **/
+  // Update existing data points
+  d3.select(".chart").selectAll("circle").data(data)
+    .attr("class", "dotPoint")
+    .attr("r", 4)
+    .attr("cx", (d, i) => x(d.ts))
+    .attr("cy", (d, i) => y(d.data_point))
+    .attr("fill", (d) => {
+      // if beyond threshold, change data point's color to red
+      return (d.data_point >= chart_config.threshold) ? red : blue;
+    })
+    .transition()
+    .duration(transitionDuration);
+
+  // Add tooltip
+  var div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("display", "none")
+    .style("opacity", 0);
+
+  // Create new data points, if there is new data
+  d3.select(".chart").selectAll("circle").data(data)
+    .enter()
+    .append("circle")
+    .attr("class", "dotPoint")
+    .attr("r", 4)
+    .attr("cx", (d, i) => x(d.ts))
+    .attr("cy", (d, i) => y(d.data_point))
+    .attr("fill", (d) => {
+      // if beyond threshold, change data point's color to red
+      return (d.data_point >= chart_config.threshold) ? red : blue;
+    })
+    .on("mouseover", function(d) {
+      div.transition()
+        .duration(200)
+        .style("display", "inline")
+        .style("opacity", .9);
+      div.html(ttFormatTime(d.ts) + "<br/>" +
+        "<b>" + d.data_point.toFixed(2) + "</b>")
+          .style("left", (d3.event.pageX) + "px")
+          .style("top", (d3.event.pageY - 28) + "px");
+      })
+    .on("mouseout", function(d) {
+      div.transition()
+        .duration(500)
+        .style("opacity", 0);
     });
 
   // Remove old data points
@@ -281,7 +547,7 @@ function updateLineChart(data) {
 /*
  * Preferences Section
  */
-// Set saved preferences value
+// Set Saved Preferences Value
 function setPreferenceValue() {
   setValue("threshold", chart_config.threshold);
   setValue("color", chart_config.color);
@@ -289,45 +555,52 @@ function setPreferenceValue() {
   setValue("timeline", chart_config.timeline);
 }
 
-// Set form value
+// Set Form Value
 function setValue(id, value) {
     var element = document.getElementById(id);
     element.value = value;
 }
 
-// Change color function
-function changeColor(e) {
-  // Get value from color drop down list
-  var color = e.target.value;
+// Change Threshold Function
+function changeThreshold(e) {
+  // Get value from threshold textbox
+  chart_config.threshold = e.target.value;
 
-  // Change the color of the line
-  d3.select(".line").attr("stroke", color);
+  d3.selectAll("circle").data(parsedData)
+    .attr("fill", (d) => {
+      return (d.data_point >= chart_config.threshold) ? red : blue;
+    })
+    .transition()
+    .duration(transitionDuration);
 }
 
-// Change timeline function
+// Change Color Function
+function changeColor(e) {
+  // Get value from color dropdown list
+  chart_config.color = e.target.value;
+
+  // Change the color of the line
+  d3.select(".line").attr("stroke", chart_config.color);
+}
+
+// Change Chart Type Function
+function changeChartType(e) {
+  // Get value from chart type dropdown list
+  chart_config.chart_type = e.target.value;
+
+  drawWhichChart(chart_config.chart_type, parsedData);
+}
+
+// Change Timeline Function
 function changeTimeline(e) {
-  // Get value from timeline drop down list
-  var timeline = e.target.value;
+  // Get value from timeline dropdown list
+  chart_config.timeline = e.target.value;
 
   api = 'http://localhost:8000/api/devices/?device_id=' + device_id +
-          '&data=' + whichData + '&timestamp=' + timeline;
+          '&data=' + whichData + '&timestamp=' + chart_config.timeline;
 
   // Fetch data from new API
   fetchDataFromAPI(api);
-}
-
-// Change threshold function
-function changeThreshold(e) {
-  var newThreshold = e.target.value;
-  console.log(newThreshold);
-
-  d3.select(".chart").selectAll("circle").data(parsedData)
-    .enter()
-    .append("circle")
-    .attr("fill", (d) => {
-      // if beyond threshold, change data point's color to red
-      return (d.temperature >= newThreshold) ? "#e60000" : " #000066";
-    });
 }
 
 //var included = [];  // Array for storing checkboxes value
@@ -355,6 +628,7 @@ function csrfSafeMethod(method) {
     // these HTTP methods do not require CSRF protection
     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
 }
+
 $.ajaxSetup({
     beforeSend: function(xhr, settings) {
         if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
@@ -363,7 +637,7 @@ $.ajaxSetup({
     }
 });
 
-// 'show_in_main' checkbox
+// 'show_in_main' Checkbox
 function isChecked(checkbox) {
   /*var isIncludedCb = document.getElementsByName("isIncluded");
   for (var i = 0; i < isIncludedCb.length; i++) {

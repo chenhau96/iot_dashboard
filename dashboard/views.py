@@ -85,6 +85,7 @@ def get_chart_config(device, which_data):
 
     return dev_config
 
+
 def is_which_data_valid(dev_id, which_data):
     """
     Check whether data field is valid
