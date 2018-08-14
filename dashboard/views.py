@@ -3,19 +3,42 @@ from django.urls import reverse
 from django.http import Http404, HttpResponseRedirect
 from datetime import timedelta
 import datetime
+import json
 
 from dashboard.models import Devices, Device, ChartConfig
 from dashboard.selectionItems import *
 
 from rest_framework_mongoengine import viewsets
-from dashboard.serializers import DevicesSerializer
+from dashboard.serializers import DevicesSerializer, DeviceConfigSerializer
 
 
 def index(request):
     """
     Main dashboard
+
+    device = Device._get_collection().aggregate([
+
+    ])
     """
-    return render(request, 'dashboard/index.html')
+    devices = Device.objects.order_by('device_id')
+    charts_in_main = {}
+
+    for device in devices:
+        arr = []
+        for i, obj in enumerate(device.chart_config):
+            data_key = ''.join(obj.keys())  # Get dictionary key
+            if obj[data_key]['show_in_main']:
+                # If 'show_in_main' is True
+                arr.append(obj)
+                print('Object value: ', obj)
+
+        charts_in_main.update({device.device_id: arr})
+
+    print('All show_in_main config: ', charts_in_main)
+
+    return render(request, 'dashboard/index.html', {
+        'charts_in_main': charts_in_main
+    })
 
 
 def device(request, dev_id):
@@ -356,10 +379,26 @@ def update_show_in_main(request, dev_id, which_data):
                 kwargs={'dev_id': dev_id, 'which_data': which_data}))
 
 
+class DeviceConfigViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for device configuration setting
+
+    API URL: http://localhost:8000/api/device-config
+    """
+    serializer_class = DeviceConfigSerializer
+
+    def get_queryset(self):
+        queryset = Device.objects.order_by('device_id')
+
+        return queryset
+
+
 class DevicesViewSet(viewsets.ModelViewSet):
     """
     API endpoint for devices data which supports filtering
     to retrieve subset of the data
+
+    API URL: http://localhost:8000/api/devices
 
     Example of API url with combined query param for filtering:
     http://localhost:8000/api/devices/?device_id=00-80-00-00-00-01-1e-d8&data=temperature
