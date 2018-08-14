@@ -34,6 +34,9 @@ urlpatterns = [
     path('device/<slug:dev_id>/<slug:which_data>/save', views.save_chart_config,
          name='save_chart_config'),
 
+    # Update show_in_main value
+    path('device/<slug:dev_id>/<slug:which_data>/update_show', views.update_show_in_main,
+         name='update_show_in_main'),
 
     # For temporary use
     path('max_vs_min_view/', views.max_vs_min_view, name='max_vs_min_view'),

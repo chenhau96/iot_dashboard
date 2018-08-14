@@ -225,7 +225,37 @@ function changeThreshold(e) {
     });
 }
 
-var included = [];  // Array for storing checkboxes value
+//var included = [];  // Array for storing checkboxes value
+
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
 
 function isChecked(checkbox) {
   /*var isIncludedCb = document.getElementsByName("isIncluded");
@@ -234,22 +264,28 @@ function isChecked(checkbox) {
       included.push(isIncludedCb[i].value);
     }
   }*/
-
+  var value = false
   if (checkbox.checked) {
-    included.push(checkbox.value);
-    alert("Included in Main Dashboard");
+    value = true
   }
   else {
-    for (var i = 0; i < included.length; i++) {
-      if (checkbox.value == included[i]) {
-        console.log("Remove");
-        included.splice(i, 1);
-        alert("Removed from Main Dashboard");
-      }
-    }
+    value = false
   }
 
-  console.log(included);
+  var update_link = 'http://localhost:8000/dashboard/device/' + device_id
+      + '/' + whichData + '/update_show';
+    //included.push(checkbox.value);
+    //alert("Included in Main Dashboard");
+    $.ajax({
+      type:'post',
+      url: update_link,
+      data: {'show_in_main': value},
+      success: function(msg) {
+        console.log("Updated value: " + value);
+      }
+    });
+
+  //console.log(included);
 }
 
 // Update chart function

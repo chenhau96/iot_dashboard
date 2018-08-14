@@ -272,6 +272,13 @@ def delete_device(request, dev_id):
 
 
 def save_chart_config(request, dev_id, which_data):
+    """
+    To save or update the preferences configured by user
+    :param request:
+    :param dev_id:
+    :param which_data:
+    :return:
+    """
     if request.method == 'POST':
         # Get the device object
         device = Device.objects(device_id=dev_id).first()
@@ -315,6 +322,37 @@ def save_chart_config(request, dev_id, which_data):
         return HttpResponseRedirect(
             reverse('dashboard:chart_detail',
                     kwargs={'dev_id': dev_id, 'which_data': which_data}))
+
+
+def update_show_in_main(request, dev_id, which_data):
+    """
+    Update the value of checkbox of 'Show in Main Dashboard'
+    Via Ajax post request without reloading the page.
+    :param request:
+    :param dev_id:
+    :param which_data:
+    :return:
+    """
+    if request.method == 'POST':
+        # Get the device object
+        device = Device.objects(device_id=dev_id).first()
+
+        newValue = request.POST['show_in_main']
+        print('New value: ', newValue)
+        for i, item in enumerate(device.chart_config):
+            field = ''.join(item.keys())  # Get dictionary key
+            if which_data == field and newValue == 'true':
+                # If exists, update the values
+                device.chart_config[i][field]['show_in_main'] = True
+                break
+            else:
+                device.chart_config[i][field]['show_in_main'] = False
+
+        device.save()
+
+    return HttpResponseRedirect(
+        reverse('dashboard:chart_detail',
+                kwargs={'dev_id': dev_id, 'which_data': which_data}))
 
 
 class DevicesViewSet(viewsets.ModelViewSet):
