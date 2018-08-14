@@ -5,7 +5,7 @@ var ttFormatTime = d3.timeFormat("%d-%m-%Y %X");
 var iconCels = "\u2103";  // Celsius icon
 var updateFlag = false;
 var updateInterval = 3000000; // 30s
-var transitionDuration = 1000; // 750ms
+var transitionDuration = 1000; // 1000ms
 
 
 // Chart width and height setting
@@ -23,8 +23,15 @@ var api = 'http://localhost:8000/api/devices/?device_id=' + device_id +
 // After everything (HTML elements) is loaded
 document.addEventListener("DOMContentLoaded", function(event) {
 
+  // Set Preferences Value
   setPreferenceValue()
 
+  // Set 'show_in_main' checkbox value
+  var checkbox = document.getElementById("show_in_main");
+  if (chart_config.show_in_main)
+    checkbox.checked = true;
+
+  // API URL
   var api = 'http://localhost:8000/api/devices/?device_id=' + device_id +
           '&data=' + whichData + '&timestamp=' + chart_config.timeline;
 
@@ -177,118 +184,7 @@ function drawLineChart(data) {
     });
 }
 
-// Set saved preferences value
-function setPreferenceValue() {
-  setValue("threshold", chart_config.threshold);
-  setValue("color", chart_config.color);
-  setValue("chart_type", chart_config.chart_type);
-  setValue("timeline", chart_config.timeline);
-}
-
-// Set form value
-function setValue(id, value) {
-    var element = document.getElementById(id);
-    element.value = value;
-}
-
-// Change color function
-function changeColor(e) {
-  // Get value from color drop down list
-  var color = e.target.value;
-
-  // Change the color of the line
-  d3.select(".line").attr("stroke", color);
-}
-
-// Change timeline function
-function changeTimeline(e) {
-  // Get value from timeline drop down list
-  var timeline = e.target.value;
-
-  api = 'http://localhost:8000/api/devices/?device_id=' + device_id +
-          '&data=' + whichData + '&timestamp=' + timeline;
-
-  // Fetch data from new API
-  fetchDataFromAPI(api);
-}
-
-function changeThreshold(e) {
-  var newThreshold = e.target.value;
-  console.log(newThreshold);
-
-  d3.select(".chart").selectAll("circle").data(parsedData)
-    .enter()
-    .append("circle")
-    .attr("fill", (d) => {
-      // if beyond threshold, change data point's color to red
-      return (d.temperature >= newThreshold) ? "#e60000" : " #000066";
-    });
-}
-
-//var included = [];  // Array for storing checkboxes value
-
-// using jQuery
-function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = jQuery.trim(cookies[i]);
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-var csrftoken = getCookie('csrftoken');
-
-function csrfSafeMethod(method) {
-    // these HTTP methods do not require CSRF protection
-    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-}
-$.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-            xhr.setRequestHeader("X-CSRFToken", csrftoken);
-        }
-    }
-});
-
-function isChecked(checkbox) {
-  /*var isIncludedCb = document.getElementsByName("isIncluded");
-  for (var i = 0; i < isIncludedCb.length; i++) {
-    if (isIncludedCb[i].checked) {
-      included.push(isIncludedCb[i].value);
-    }
-  }*/
-  var value = false
-  if (checkbox.checked) {
-    value = true
-  }
-  else {
-    value = false
-  }
-
-  var update_link = 'http://localhost:8000/dashboard/device/' + device_id
-      + '/' + whichData + '/update_show';
-    //included.push(checkbox.value);
-    //alert("Included in Main Dashboard");
-    $.ajax({
-      type:'post',
-      url: update_link,
-      data: {'show_in_main': value},
-      success: function(msg) {
-        console.log("Updated value: " + value);
-      }
-    });
-
-  //console.log(included);
-}
-
-// Update chart function
+// Update line chart function
 function updateLineChart(data) {
   // Scale the x and y axis again
   var x = d3.scaleTime()
@@ -380,4 +276,124 @@ function updateLineChart(data) {
     .exit()
     .remove();
 }
+
+
+/*
+ * Preferences Section
+ */
+// Set saved preferences value
+function setPreferenceValue() {
+  setValue("threshold", chart_config.threshold);
+  setValue("color", chart_config.color);
+  setValue("chart_type", chart_config.chart_type);
+  setValue("timeline", chart_config.timeline);
+}
+
+// Set form value
+function setValue(id, value) {
+    var element = document.getElementById(id);
+    element.value = value;
+}
+
+// Change color function
+function changeColor(e) {
+  // Get value from color drop down list
+  var color = e.target.value;
+
+  // Change the color of the line
+  d3.select(".line").attr("stroke", color);
+}
+
+// Change timeline function
+function changeTimeline(e) {
+  // Get value from timeline drop down list
+  var timeline = e.target.value;
+
+  api = 'http://localhost:8000/api/devices/?device_id=' + device_id +
+          '&data=' + whichData + '&timestamp=' + timeline;
+
+  // Fetch data from new API
+  fetchDataFromAPI(api);
+}
+
+// Change threshold function
+function changeThreshold(e) {
+  var newThreshold = e.target.value;
+  console.log(newThreshold);
+
+  d3.select(".chart").selectAll("circle").data(parsedData)
+    .enter()
+    .append("circle")
+    .attr("fill", (d) => {
+      // if beyond threshold, change data point's color to red
+      return (d.temperature >= newThreshold) ? "#e60000" : " #000066";
+    });
+}
+
+//var included = [];  // Array for storing checkboxes value
+
+/** Get csrf token in order to post data using Ajax **/
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+// 'show_in_main' checkbox
+function isChecked(checkbox) {
+  /*var isIncludedCb = document.getElementsByName("isIncluded");
+  for (var i = 0; i < isIncludedCb.length; i++) {
+    if (isIncludedCb[i].checked) {
+      included.push(isIncludedCb[i].value);
+    }
+  }*/
+  var value = false
+  if (checkbox.checked) {
+    value = true
+  }
+  else {
+    value = false
+  }
+
+  var update_link = 'http://localhost:8000/dashboard/device/' + device_id
+      + '/' + whichData + '/update_show';
+    //included.push(checkbox.value);
+    //alert("Included in Main Dashboard");
+    $.ajax({
+      type:'post',
+      url: update_link,
+      data: {'show_in_main': value},
+      success: function(msg) {
+        console.log("Updated value: " + value);
+      }
+    });
+
+  //console.log(included);
+}
+
+
 

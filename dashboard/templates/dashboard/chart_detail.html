@@ -13,7 +13,7 @@
         color: "{{ dev_config.color }}",
         chart_type: "{{ dev_config.chart_type }}",
         timeline: "{{ dev_config.timeline }}",
-        showInMain: true ? "{{ dev_config.show_in_main }}" == "True" : false,
+        show_in_main: true ? "{{ dev_config.show_in_main }}" == "True" : false,
     };
 
 </script>
@@ -30,7 +30,7 @@
                 <div class="card-header">
                     <h6 class="chart-title"></h6>
                     <div class="form-check show-in-main">
-                            <input class="form-check-input" type="checkbox"
+                            <input class="form-check-input" type="checkbox" id="show_in_main"
                                    name="show_in_main" value="{{ whichData }}"
                                    onchange="isChecked(this)">
                             <label class="form-check-label">Show in Main Dashboard</label>
