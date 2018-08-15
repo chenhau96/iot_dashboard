@@ -3,7 +3,6 @@ from django.urls import reverse
 from django.http import Http404, HttpResponseRedirect
 from datetime import timedelta
 import datetime
-import json
 
 from dashboard.models import Devices, Device, ChartConfig
 from dashboard.selectionItems import *
@@ -36,9 +35,7 @@ def index(request):
 
     print('All show_in_main config: ', charts_in_main)
 
-    return render(request, 'dashboard/index.html', {
-        'charts_in_main': charts_in_main
-    })
+    return render(request, 'dashboard/index.html')
 
 
 def device(request, dev_id):

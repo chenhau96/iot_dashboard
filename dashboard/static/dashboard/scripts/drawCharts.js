@@ -16,7 +16,7 @@ var height = svgHeight - margin.top - margin.bottom;
 var width_mid = width / 2;
 var height_mid = height / 2;
 
-// API URL
+// API URL for device data
 var api = 'http://localhost:8000/api/devices/?device_id=' + device_id +
         '&data=' + whichData + '&timestamp=' + chart_config.timeline;
 

@@ -65,20 +65,6 @@ function drawLineChart(data, whichData) {
     .attr("href", url)
     .text(chartTitle);
 
-  card_header.append("input")
-    .attr("class", "checkbox success sr-only text-right")
-    .attr("id", "switch-" + whichData)
-    .attr("type", "checkbox")
-    .append("label")
-    .attr("for", "switch-" + whichData)
-    .attr("class", "toggle rounded form-control-label")
-    .attr("aria-hidden", "true")
-    .append("span")
-    .attr("class", "on")
-    .text("On")
-    .append("span", "off")
-    .text("Off");
-
   // Card body to hold the chart
   div.append("div")
     .attr("class", "card-body")

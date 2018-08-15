@@ -1,18 +1,12 @@
 {% extends "dashboard/_header_nav.html" %}
 
+{% load static %}
+
 {% block content %}
+<script src="{% static 'dashboard/scripts/index.js' %}"></script>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script>
-    {% for key, value in charts_in_main.items %}
-        var device_id = "{{ key }}";
-        console.log(device_id);
-        console.log("{{ key.value] }}");
-        {% for chart_key in value %}
-            console.log("{{ chart_key }}");
-            //console.log("{{ chart_value }}");
-        {% endfor %}
 
-    {% endfor %}
 </script>
 
 <div class="container-fluid">
@@ -73,6 +67,8 @@
             </div>
         </div>
     </div>
+
+    <div id="chart-content"></div>
 </div>
 
 
