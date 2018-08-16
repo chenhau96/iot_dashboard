@@ -14,27 +14,7 @@ from dashboard.serializers import DevicesSerializer, DeviceConfigSerializer
 def index(request):
     """
     Main dashboard
-
-    device = Device._get_collection().aggregate([
-
-    ])
     """
-    devices = Device.objects.order_by('device_id')
-    charts_in_main = {}
-
-    for device in devices:
-        arr = []
-        for i, obj in enumerate(device.chart_config):
-            data_key = ''.join(obj.keys())  # Get dictionary key
-            if obj[data_key]['show_in_main']:
-                # If 'show_in_main' is True
-                arr.append(obj)
-                print('Object value: ', obj)
-
-        charts_in_main.update({device.device_id: arr})
-
-    print('All show_in_main config: ', charts_in_main)
-
     return render(request, 'dashboard/index.html')
 
 
@@ -68,7 +48,7 @@ def chart_detail(request, dev_id, which_data):
     :param which_data: data field of a device
     :return:
     """
-    device = Device.objects(device_id=dev_id)[0]
+    device = Device.objects(device_id=dev_id).first()
 
     # Set default chart configuration
     dev_config = get_chart_config(device, which_data)
@@ -292,6 +272,12 @@ def delete_device(request, dev_id):
     return HttpResponseRedirect(reverse('dashboard:devices_management'))
 
 
+def get_latest_data(request, dev_id):
+    device_data = Devices.objects(device_id=dev_id)[:-1]
+
+    return device_data
+
+
 def save_chart_config(request, dev_id, which_data):
     """
     To save or update the preferences configured by user
@@ -396,6 +382,20 @@ def update_show_in_main(request, dev_id, which_data):
                 kwargs={'dev_id': dev_id, 'which_data': which_data}))
 
 
+def update_status(request, dev_id):
+
+    if request.method == 'POST':
+        device = Device.objects(device_id=dev_id).first()
+        print("Device: ", device)
+        status = request.POST['status']
+
+        device.status = status
+
+        device.save()
+
+    return HttpResponseRedirect(reverse('dashboard:devices_management'))
+
+
 class DeviceConfigViewSet(viewsets.ModelViewSet):
     """
     API endpoint for device configuration setting
@@ -482,6 +482,9 @@ class DevicesViewSet(viewsets.ModelViewSet):
                 return queryset\
                     .only('device_id', 'timestamp', 'data__'+data)
 
+            if data == 'latest':
+                return queryset.order_by('-timestamp')[:1]
+
             # Set queryset to none if 'data' param is invalid
             queryset = None
 
@@ -489,23 +492,9 @@ class DevicesViewSet(viewsets.ModelViewSet):
 
 
 # For temporary use
-def max_vs_min_view(request):
-    return render(request, 'dashboard/chart_detail.html')
-
-def avg_temp(request):
-    return render(request, 'dashboard/avg-temp.html')
-
-def snowView(request):
-    return render(request, 'dashboard/snowView.html')
-
-def precipitationView(request):
-    return render(request, 'dashboard/precipitationView.html')
-
 def mapView(request):
     return render(request, 'dashboard/mapView.html')
 
-def device_table(request):
-    return render(request, 'dashboard/device_management.html')
 
 
 

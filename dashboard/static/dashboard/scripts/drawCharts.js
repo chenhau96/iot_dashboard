@@ -603,7 +603,6 @@ function changeTimeline(e) {
   fetchDataFromAPI(api);
 }
 
-//var included = [];  // Array for storing checkboxes value
 
 /** Get csrf token in order to post data using Ajax **/
 // using jQuery

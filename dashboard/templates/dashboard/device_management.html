@@ -5,6 +5,9 @@
 {% block content %}
 
 <script src="{% static 'dashboard/scripts/deviceMgt.js' %}"></script>
+<script>
+
+</script>
 
 <!-- Modal -->
 <div class="modal fade" id="confirmation" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -50,17 +53,14 @@
                 <tbody>
                     {% for device in devices %}
                     <tr>
-                        <td>{{ device.device_id }}</td>
+                        <td class="device_id">{{ device.device_id }}</td>
                         <td>{{ device.device_name|title }}</td>
                         <td>
                             <b>Lat:</b> {{ device.gps_loc.0 }}</br>
                             <b>Long:</b> {{ device.gps_loc.1 }}
                         </td>
-                        {% if device.status == "online" %}
-                            <td class="text-success text-center">{{ device.status|title }}</td>
-                        {% else %}
-                            <td class="text-danger text-center">{{ device.status|title }}</td>
-                        {% endif %}
+
+                            <td id="{{ device.device_id }}_status">{{ device.status|title }}</td>
                         <td>
                             <a class="btn btn-primary btn-sm custom-btn-size"
                                href="{% url 'dashboard:update_device' device.device_id %}" role="button">Edit</a>
@@ -75,7 +75,7 @@
             </table>
         </div>
     </div>
-    <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+    <div class="card-footer small text-muted"></div>
 </div>
 
 
