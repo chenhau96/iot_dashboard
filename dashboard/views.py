@@ -309,8 +309,6 @@ def save_chart_config(request, dev_id, which_data):
         color = request.POST['color']
         chart_type = request.POST['chart_type']
         timeline = request.POST['timeline']
-        #show_in_main = request.POST['show_in_main']
-        #print('Value of show_in_main', show_in_main)
 
         # Create a ChartConfig object
         chart_config = ChartConfig(
@@ -366,7 +364,7 @@ def update_show_in_main(request, dev_id, which_data):
                 # If exists, update the values
                 device.chart_config[i][field]['show_in_main'] = True
                 break
-            else:
+            elif newValue != 'true':
                 device.chart_config[i][field]['show_in_main'] = False
 
         device.save()

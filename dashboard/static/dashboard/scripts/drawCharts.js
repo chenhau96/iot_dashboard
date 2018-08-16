@@ -639,12 +639,6 @@ $.ajaxSetup({
 
 // 'show_in_main' Checkbox
 function isChecked(checkbox) {
-  /*var isIncludedCb = document.getElementsByName("isIncluded");
-  for (var i = 0; i < isIncludedCb.length; i++) {
-    if (isIncludedCb[i].checked) {
-      included.push(isIncludedCb[i].value);
-    }
-  }*/
   var value = false
   if (checkbox.checked) {
     value = true
@@ -655,18 +649,15 @@ function isChecked(checkbox) {
 
   var update_link = 'http://localhost:8000/dashboard/device/' + device_id
       + '/' + whichData + '/update_show';
-    //included.push(checkbox.value);
-    //alert("Included in Main Dashboard");
-    $.ajax({
-      type:'post',
-      url: update_link,
-      data: {'show_in_main': value},
-      success: function(msg) {
-        console.log("Updated value: " + value);
-      }
-    });
 
-  //console.log(included);
+  $.ajax({
+    type:'post',
+    url: update_link,
+    data: {'show_in_main': value},
+    success: function(msg) {
+      console.log("Updated value: " + value);
+    }
+  });
 }
 
 

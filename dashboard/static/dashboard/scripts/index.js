@@ -2,6 +2,9 @@
 var parsedData;
 var dev_config;
 
+var row;
+var chartCount = 0;
+
 var updateFlag = false;
 var chartTitle = "";
 var ttFormatTime = d3.timeFormat("%d-%m-%Y %X");
@@ -10,8 +13,8 @@ var transitionDuration = 1000; // 1000ms
 var red = "#e60000", blue = "#000066";  // color hex code
 
 // Chart width and height setting
-var svgWidth = 350, svgHeight = 200;
-var margin = { top: 20, right: 20, bottom: 50, left: 80 };
+var svgWidth = 300, svgHeight = 200;
+var margin = { top: 20, right: 20, bottom: 50, left: 50 };
 var width = svgWidth - margin.left - margin.right;
 var height = svgHeight - margin.top - margin.bottom;
 var width_mid = width / 2;
@@ -43,7 +46,6 @@ function fetchDeviceConfig(api) {
               var data = dev_config[obj].chart_config[whichData];
               data = Object.keys(data);
               var timestamp = dev_config[obj].chart_config[whichData][data].timeline;
-              var chart_type = dev_config[obj].chart_config[whichData][data].chart_type;
 
               var chart_config = {
                 threshold: dev_config[obj].chart_config[whichData][data].threshold,
@@ -56,7 +58,7 @@ function fetchDeviceConfig(api) {
               var data_api = 'http://localhost:8000/api/devices/?device_id=' +
                 device_id + '&data=' + data + '&timestamp=' + timestamp;
 
-              fetchDataFromAPI(data_api, data, chart_config)
+              fetchDataFromAPI(data_api, device_id, data, chart_config)
             }
           }
         }
@@ -108,21 +110,6 @@ function getDeviceConfig(apiData) {
 
 }
 
-function fetchDataFromAPI(api, whichData, chart_config) {
-  fetch(api)
-    .then(function(response) { return response.json(); })
-    .then(function(apiData) {
-      if (apiData.length == 0) {
-        alert("No data is retrieved.");
-      }
-      else {
-        parsedData = parseData(apiData, whichData);
-
-        drawWhichChart(chart_config, parsedData);
-      }
-    })
-}
-
 function parseData(apiData, whichData) {
   var arr = [];
 
@@ -144,20 +131,44 @@ function parseData(apiData, whichData) {
   return arr;
 }
 
-function generateCard() {
+function fetchDataFromAPI(api, device_id, whichData, chart_config) {
+  fetch(api)
+    .then(function(response) { return response.json(); })
+    .then(function(apiData) {
+      if (apiData.length == 0) {
+        alert("No data is retrieved.");
+      }
+      else {
+        parsedData = parseData(apiData, whichData);
+
+        generateCard(device_id, whichData);
+        drawWhichChart(chart_config, whichData, parsedData);
+      }
+    })
+}
+
+// Function to generate card to hold each chart
+function generateCard(device_id, whichData) {
+  whichData = whichData + "";
+
   // Make first letter of each data uppercase, to become the chart title
   var firstLetterUpper = whichData.charAt(0).toUpperCase();
-  var chartTitle = firstLetterUpper + whichData.substr(1);
+  chartTitle = firstLetterUpper + whichData.substr(1);
 
   // Generate the url for each chart, to link to chart detail page
-  var url = chart_detail_url.replace("data", whichData);
+  var chart_detail_url = "http://localhost:8000/dashboard/device/" +
+    device_id + "/" + whichData;
+
 
   // Generate a card skeleton to hold chart title and the chart
-  var div = d3.select(".device-charts")
+  if (chartCount % 3 == 0) {
+    row = d3.select("#device-charts")
     .append("div")
-    .attr("class", "row")
-      .append("div")
-      .attr("class", "col-lg-8")
+    .attr("class", "row");
+  }
+
+  var div = row.append("div")
+      .attr("class", "col-md-4 mb-3")
         .append("div")
         .attr("class", "card mb-3");
 
@@ -166,24 +177,26 @@ function generateCard() {
     .attr("class", "card-header")
 
   card_header.append("a")
-    .attr("href", url)
+    .attr("href", chart_detail_url)
     .text(chartTitle);
 
   // Card body to hold the chart
   div.append("div")
     .attr("class", "card-body")
     .attr("id", whichData);
+
+  chartCount++;
 }
 
 // Function to process which chart type to draw
-function drawWhichChart(chart_config, data) {
+function drawWhichChart(chart_config, whichData, data) {
   switch(chart_config.chart_type) {
     case 'scatterplot':
-      drawScatterPlot(data, chart_config);
+      drawScatterPlot(chart_config, whichData, data);
       break;
     case 'linechart':
     default:
-      drawLineChart(data, chart_config);
+      drawLineChart(chart_config, whichData, data);
   }
 }
 
@@ -200,13 +213,13 @@ function updateWhichChart(chart_type, data) {
 }
 
 // Line Chart
-function drawLineChart(data, chart_config) {
+function drawLineChart(chart_config, whichData, data) {
   console.log(chart_config);
   // Remove existing svg if any
   //d3.select("svg").remove();
 
   // Set svg width and height
-  var svg = d3.select("#chart-content")
+  var svg = d3.select("#" + whichData)
     .append("svg")
     .attr("width", svgWidth)
     .attr("height", svgHeight);
@@ -266,7 +279,7 @@ function drawLineChart(data, chart_config) {
     .attr("class", "text-label")
     .attr("fill", "#000")
     .attr("x", 60 - height_mid)
-    .attr("y", 30 - margin.left)
+    .attr("y", 10 - margin.left)
     .attr("transform", "rotate(-90)")
     .attr("text-anchor", "end")
     .text(() => {
@@ -436,11 +449,11 @@ function updateLineChart(data) {
 }
 
 // Scatterplot
-function drawScatterPlot(data, chart_config) {
+function drawScatterPlot(chart_config, whichData, data) {
   // Remove existing svg if any
   //d3.select("svg").remove();
 
-  var svg = d3.select("#chart-content")
+  var svg = d3.select("#" + whichData)
     .append("svg")
     .attr("width", svgWidth)
     .attr("height", svgHeight);
