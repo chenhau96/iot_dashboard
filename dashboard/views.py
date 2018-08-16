@@ -316,7 +316,6 @@ def save_chart_config(request, dev_id, which_data):
             color=color,
             chart_type=chart_type,
             timeline=timeline,
-            show_in_main=False,
         )
 
         # Check if the chart config for which_data is exists
@@ -327,7 +326,13 @@ def save_chart_config(request, dev_id, which_data):
             if which_data == field:
                 # If exists, update the values
                 isExist = True
-                device.chart_config[i][field] = chart_config
+
+                # Replace with new values
+                device.chart_config[i][field].threshold = threshold
+                device.chart_config[i][field].color = color
+                device.chart_config[i][field].chart_type = chart_type
+                device.chart_config[i][field].timeline = timeline
+
                 break
 
         if not isExist:
@@ -356,16 +361,33 @@ def update_show_in_main(request, dev_id, which_data):
         # Get the device object
         device = Device.objects(device_id=dev_id).first()
 
+        isExist = False
+
         newValue = request.POST['show_in_main']
+        toShow = True if newValue == 'true' else False
+
         print('New value: ', newValue)
         for i, item in enumerate(device.chart_config):
             field = ''.join(item.keys())  # Get dictionary key
-            if which_data == field and newValue == 'true':
+            if which_data == field and toShow:
                 # If exists, update the values
+                isExist = True
                 device.chart_config[i][field]['show_in_main'] = True
                 break
-            elif newValue != 'true':
+            elif which_data == field and not toShow:
                 device.chart_config[i][field]['show_in_main'] = False
+            elif not isExist and i == len(device.chart_config) - 1:
+                # Create a ChartConfig object
+                chart_config = ChartConfig(
+                    threshold=device.default_config.threshold,
+                    color=device.default_config.color,
+                    chart_type=device.default_config.chart_type,
+                    timeline=device.default_config.timeline,
+                    show_in_main=toShow,
+                )
+
+                device.chart_config.append({which_data: chart_config})
+
 
         device.save()
 

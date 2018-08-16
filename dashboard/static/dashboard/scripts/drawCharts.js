@@ -655,7 +655,13 @@ function isChecked(checkbox) {
     url: update_link,
     data: {'show_in_main': value},
     success: function(msg) {
-      console.log("Updated value: " + value);
+      // Show the modal
+      $('#cb-result').modal('show');
+
+      if (value)
+        $('.modal-body').text("Added to main dashboard.");
+      else
+        $('.modal-body').text("Removed from main dashboard.");
     }
   });
 }
