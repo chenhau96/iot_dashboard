@@ -55,6 +55,8 @@ function getAllDevicesId() {
 function setStatusClassName(dev_id) {
   // Get the status element in table
   var statusElement = $('#' + dev_id + '_status');
+  statusElement.removeClass();
+
   var status = statusElement.html();
 
   // Set the class

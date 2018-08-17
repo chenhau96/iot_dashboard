@@ -267,7 +267,7 @@ def delete_device(request, dev_id):
     if device:
         device.delete()
     else:
-        error = "device not found"
+        raise Http404("Device not found")
 
     return HttpResponseRedirect(reverse('dashboard:devices_management'))
 

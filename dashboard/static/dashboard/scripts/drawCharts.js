@@ -565,6 +565,7 @@ function setValue(id, value) {
 function changeThreshold(e) {
   // Get value from threshold textbox
   chart_config.threshold = e.target.value;
+  console.log("New threshold value: " + e.target.value);
 
   d3.selectAll("circle").data(parsedData)
     .attr("fill", (d) => {
@@ -578,6 +579,7 @@ function changeThreshold(e) {
 function changeColor(e) {
   // Get value from color dropdown list
   chart_config.color = e.target.value;
+  console.log("New color value: " + e.target.value);
 
   // Change the color of the line
   d3.select(".line").attr("stroke", chart_config.color);
@@ -587,6 +589,7 @@ function changeColor(e) {
 function changeChartType(e) {
   // Get value from chart type dropdown list
   chart_config.chart_type = e.target.value;
+  console.log("New chart type value: " + e.target.value);
 
   drawWhichChart(chart_config.chart_type, parsedData);
 }
@@ -595,6 +598,7 @@ function changeChartType(e) {
 function changeTimeline(e) {
   // Get value from timeline dropdown list
   chart_config.timeline = e.target.value;
+  console.log("New timeline value: " + e.target.value);
 
   api = 'http://localhost:8000/api/devices/?device_id=' + device_id +
           '&data=' + whichData + '&timestamp=' + chart_config.timeline;
@@ -640,10 +644,12 @@ $.ajaxSetup({
 function isChecked(checkbox) {
   var value = false
   if (checkbox.checked) {
-    value = true
+    value = true;
+    console.log("Checkbox is checked");
   }
   else {
-    value = false
+    value = false;
+    console.log("Checkbox is unchecked");
   }
 
   var update_link = 'http://localhost:8000/dashboard/device/' + device_id
