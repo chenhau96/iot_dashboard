@@ -8,13 +8,12 @@ var chartCount = 0;
 var updateFlag = false;
 var chartTitle = "";
 var ttFormatTime = d3.timeFormat("%d-%m-%Y %X");
-var iconCels = "\u2103";  // Celsius icon
 var transitionDuration = 1000; // 1000ms
 var red = "#e60000", blue = "#000066";  // color hex code
 
 // Chart width and height setting
-var svgWidth = 300, svgHeight = 200;
-var margin = { top: 20, right: 20, bottom: 50, left: 50 };
+var svgWidth = 300, svgHeight = 190;
+var margin = { top: 10, right: 10, bottom: 20, left: 30 };
 var width = svgWidth - margin.left - margin.right;
 var height = svgHeight - margin.top - margin.bottom;
 var width_mid = width / 2;
@@ -159,7 +158,6 @@ function generateCard(device_id, whichData) {
   var chart_detail_url = "http://localhost:8000/dashboard/device/" +
     device_id + "/" + whichData;
 
-
   // Generate a card skeleton to hold chart title and the chart
   if (chartCount % 3 == 0) {
     row = d3.select("#device-charts")
@@ -170,7 +168,7 @@ function generateCard(device_id, whichData) {
   var div = row.append("div")
       .attr("class", "col-md-4 mb-3")
         .append("div")
-        .attr("class", "card mb-3");
+        .attr("class", "card");
 
   // Card header to hold the chart title
   var card_header = div.append("h6")
@@ -182,7 +180,7 @@ function generateCard(device_id, whichData) {
 
   // Card body to hold the chart
   div.append("div")
-    .attr("class", "card-body")
+    .attr("class", "card-body p-3")
     .attr("id", whichData);
 
   chartCount++;
@@ -263,30 +261,12 @@ function drawLineChart(chart_config, whichData, data) {
   g.append("g")
     .attr("class", "x-axis")
     .attr("transform", "translate(0," + height + ")")
-    .call(xAxis)
-    .append("text")
-    .attr("class", "text-label")
-    .attr("fill", "#000")
-    .attr("transform", "translate(" + width_mid + ", " + 40 + ")")
-    .attr("text-anchor", "middle")
-    .text("Timeline");
+    .call(xAxis);
 
   // append y-axis and label in a group tag
   g.append("g")
     .attr("class", "y-axis")
-    .call(yAxis)
-    .append("text")
-    .attr("class", "text-label")
-    .attr("fill", "#000")
-    .attr("x", 60 - height_mid)
-    .attr("y", 10 - margin.left)
-    .attr("transform", "rotate(-90)")
-    .attr("text-anchor", "end")
-    .text(() => {
-      if (chartTitle == "Temperature")
-        chartTitle += " " + iconCels;
-      return chartTitle;
-    });
+    .call(yAxis);
 
   // add line path of the line chart
   g.append("path")
@@ -488,30 +468,12 @@ function drawScatterPlot(chart_config, whichData, data) {
   chart.append("g")
     .attr("class", "x-axis")
     .attr("transform", "translate(0," + height + ")")
-    .call(xAxis)
-    .append("text")
-    .attr("class", "text-label")
-    .attr("fill", "#000")
-    .attr("transform", "translate(" + width_mid + ", " + 40 + ")")
-    .attr("text-anchor", "middle")
-    .text("Timeline");
+    .call(xAxis);
 
   // append y-axis and label in a group tag
   chart.append("g")
     .attr("class", "y-axis")
-    .call(yAxis)
-    .append("text")
-    .attr("class", "text-label")
-    .attr("fill", "#000")
-    .attr("x", 60 - height_mid)
-    .attr("y", 30 - margin.left)
-    .attr("transform", "rotate(-90)")
-    .attr("text-anchor", "end")
-    .text(() => {
-      if (chartTitle == "Temperature")
-        chartTitle += " " + iconCels;
-      return chartTitle;
-    });
+    .call(yAxis);
 
   // Add tooltip
   var div = d3.select("body").append("div")

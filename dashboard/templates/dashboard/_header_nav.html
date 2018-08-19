@@ -17,17 +17,12 @@
 
     <!-- Bootstrap core CSS-->
     <link href="{% static 'dashboard/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
-    <!-- Custom fonts for this template-->
+    <!-- Font Awesome Icon -->
     <link href="{% static 'dashboard/vendor/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
-    <!-- Custom styles for this template-->
-    <link href="{% static 'dashboard/css/sb-admin.css' %}" rel="stylesheet">
 
     <!-- Bootstrap core JavaScript-->
     <script src="{% static 'dashboard/vendor/jquery/jquery.min.js' %}"></script>
     <script src="{% static 'dashboard/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-
-    <!-- Custom scripts for all pages-->
-    <script src="{% static 'dashboard/js/sb-admin.min.js'%}"></script>
 
     <!-- CSS styling -->
     <link href="{% static 'dashboard/css/charts.css' %}" rel="stylesheet">
@@ -64,7 +59,7 @@
 
                         {% for device in devices %}
                         <li>
-                            <a href="{% url 'dashboard:device' dev_id=device.device_id %}">
+                            <a href="{% url 'dashboard:device_dashboard' dev_id=device.device_id %}">
                                 {{ device.device_name}}
                             </a>
                         </li>

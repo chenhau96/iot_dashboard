@@ -1,13 +1,9 @@
 
 var updateInterval = 30000; // 30s
+var formatTime = d3.timeFormat("%a, %B %d %Y, %X");
 
 // API URL for device configuration
 var deviceConfigAPI = 'http://localhost:8000/api/device-config/';
-
-// Maximum heartbeat value
-// If beyond the heartbeat value, the device is said to be offline
-var heartbeat = 24.0;
-
 
 // After everything (HTML elements) is loaded
 document.addEventListener("DOMContentLoaded", function(event) {
@@ -18,14 +14,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
   for (var i = 0; i < dev_id_arr.length; i++)
     setStatusClassName(dev_id_arr[i]);
 
-  // Fetch latest data from multiple devices to get the latest
-  // data timestamp in order to calculate the difference
-  // between current time and latest data timestamp
-  fetchFromMultipleDevices(dev_id_arr);
+  // First update on device status
+  updateMultipleDeviceStatus(dev_id_arr);
 
   // Update the table based on updateInterval value
   setInterval(function() {
-    fetchFromMultipleDevices(dev_id_arr);
+    updateMultipleDeviceStatus(dev_id_arr);
   }, updateInterval);
 });
 
@@ -66,47 +60,21 @@ function setStatusClassName(dev_id) {
     statusElement.addClass("text-danger text-center");
 }
 
-// Fetch latest data from multiple devices
-function fetchFromMultipleDevices(dev_id_arr) {
-  for (var i = 0; i < dev_id_arr.length; i++) {
-    var api = 'http://localhost:8000/api/devices/?device_id=' +
-      dev_id_arr[i] + '&data=latest';
-    console.log(api);
+// Set the latest device status fetched from device config data
+function setStatus(dev_id, status) {
+  // Get the status element in table
+  var statusElement = $('#' + dev_id + '_status');
 
-    // Fetch data from API
-    fetchLatestDataFromAPI(api, dev_id_arr[i]);
-  }
+  var firstLetter = status.charAt(0).toUpperCase();
+  var statusText = firstLetter + status.substr(1);
+  statusElement.text(statusText);
 }
 
-// Fetch latest data from single device
-function fetchLatestDataFromAPI(api, device_id) {
-  fetch(api)
-    .then(function(response) { return response.json(); })
-    .then(function(apiData) {
-      console.log(apiData);
-      if (apiData.length != 0) {
-        // Get latest time and current time
-        var latest = new Date(apiData[0].timestamp);
-        var localLatestTime = latest.getTime() - (latest.getTimezoneOffset() * 60000);
-
-        var currentTime = new Date();
-
-        // 36e5 denotes 60*60*1000ms
-        // Get hours difference
-        difference = Math.abs(currentTime - localLatestTime) / 36e5;
-        console.log(difference);
-        var status = "offline";
-
-        // Check status and update status
-        if (difference <= heartbeat) {
-          // If difference more than 24 hours, update to offline
-          status = "online";
-        }
-
-        updateStatus(device_id, status);
-      }
-
-    })
+// Fetch latest data from multiple devices
+function updateMultipleDeviceStatus(dev_id_arr) {
+  for (var i = 0; i < dev_id_arr.length; i++) {
+    updateStatus(dev_id_arr[i]);
+  }
 }
 
 
@@ -144,7 +112,7 @@ $.ajaxSetup({
 
 // Update device status by using AJAX to post status data
 // and update to database
-function updateStatus(device_id, status) {
+function updateStatus(device_id) {
 
   var update_link = 'http://localhost:8000/dashboard/update_status/'
     + device_id;
@@ -152,41 +120,18 @@ function updateStatus(device_id, status) {
   console.log(update_link);
 
   $.ajax({
-    type:'post',
+    type:'GET',
     url: update_link,
-    data: {'status': status},
-    success: function(msg) {
-      // update the time in the footer
-      fetchDeviceConfig(deviceConfigAPI);
-      setStatusClassName(device_id);
-      $('.card-footer').text("Updated at " + new Date())
+    success: function(status) {
+      if (status == "Fail")
+        console.log("Device ID " + device_id + " has no data");
+      else {
+        // Update status in device table
+        // Update the time in the footer
+        setStatus(device_id, status);
+        setStatusClassName(device_id);
+        $('.card-footer').text("Updated at " + formatTime(new Date()));
+      }
     }
   });
-}
-
-// Fetch device config data from database
-function fetchDeviceConfig(api) {
-  fetch(api)
-    .then(function(response) { return response.json(); })
-    .then(function(apiData) {
-      if (apiData) {
-        for (var i in apiData) {
-          // Get the device_id and status
-          var device_id = apiData[i].device_id;
-          var status = apiData[i].status;
-
-          setStatus(device_id, status);
-        }
-      }
-    })
-}
-
-// Set the latest device status fetched from device config data
-function setStatus(dev_id, status) {
-  // Get the status element in table
-  var statusElement = $('#' + dev_id + '_status');
-
-  var firstLetter = status.charAt(0).toUpperCase();
-  var statusText = firstLetter + status.substr(1);
-  statusElement.text(statusText);
 }

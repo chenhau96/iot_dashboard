@@ -5,9 +5,53 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="05496795-e2ce-41d0-a7e9-fe3aeb4ae138" name="Default" comment="wrote test case for connecting database and query documents in devices collection.">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/css/customStyles.css" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard/static/dashboard/css/customStyles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/css/sb-admin.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/css/sb-admin.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/js/sb-admin-charts.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/js/sb-admin-charts.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/js/sb-admin-datatables.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/js/sb-admin-datatables.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/js/sb-admin.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/js/sb-admin.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/pug/blank.pug" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/pug/cards.pug" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/pug/charts.pug" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/pug/forgot-password.pug" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/pug/includes/css/core.pug" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/pug/includes/css/custom.pug" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/pug/includes/footer.pug" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/pug/includes/js/core.pug" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/pug/includes/js/custom.pug" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/pug/includes/modals/logout.pug" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/pug/includes/navbar.pug" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/pug/includes/scroll-to-top.pug" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/pug/index.pug" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/pug/login.pug" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/pug/navbar.pug" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/pug/register.pug" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/pug/tables.pug" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/scripts/deviceMgt.js" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard/static/dashboard/scripts/deviceMgt.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/scripts/drawCharts.js" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard/static/dashboard/scripts/drawCharts.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dashboard/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard/tests.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/scripts/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard/static/dashboard/scripts/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/scss/_cards.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/scss/_footer.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/scss/_global.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/scss/_login.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/scss/_mixins.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/scss/_utilities.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/scss/_variables.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/scss/navbar/_navbar_colors.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/scss/navbar/_navbar_fixed.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/scss/navbar/_navbar_global.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/scss/navbar/_navbar_static.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/scss/navbar/_navbar_toggle.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/scss/sb-admin.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/vendor/datatables/dataTables.bootstrap4.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/vendor/datatables/dataTables.bootstrap4.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/static/dashboard/vendor/datatables/jquery.dataTables.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/templates/dashboard/_header_nav.html" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard/templates/dashboard/_header_nav.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dashboard/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dashboard/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/dashboard/views.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -23,54 +67,91 @@
           <entry key="project.closed" value="8" />
           <entry key="project.open.time.23" value="1" />
           <entry key="project.open.time.25" value="3" />
-          <entry key="project.open.time.33" value="1" />
+          <entry key="project.open.time.26" value="1" />
+          <entry key="project.open.time.33" value="2" />
           <entry key="project.open.time.34" value="1" />
           <entry key="project.open.time.8" value="1" />
           <entry key="project.open.time.9" value="1" />
-          <entry key="project.opened" value="8" />
+          <entry key="project.opened" value="10" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="css" value="1514" />
-          <entry key="html" value="8465" />
-          <entry key="js" value="18578" />
-          <entry key="py" value="17249" />
+          <entry key="css" value="1763" />
+          <entry key="html" value="8494" />
+          <entry key="js" value="18931" />
+          <entry key="py" value="18114" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="CSS" value="1514" />
-          <entry key="HTML" value="8465" />
-          <entry key="JavaScript" value="18578" />
-          <entry key="Python" value="17249" />
+          <entry key="CSS" value="1763" />
+          <entry key="HTML" value="8494" />
+          <entry key="JavaScript" value="18931" />
+          <entry key="Python" value="18114" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="CSS" value="22" />
-          <entry key="HTML" value="65" />
-          <entry key="JavaScript" value="21" />
-          <entry key="Python" value="56" />
+          <entry key="CSS" value="23" />
+          <entry key="HTML" value="67" />
+          <entry key="JavaScript" value="27" />
+          <entry key="Python" value="57" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="css" value="22" />
-          <entry key="html" value="65" />
-          <entry key="js" value="21" />
-          <entry key="py" value="56" />
+          <entry key="css" value="23" />
+          <entry key="html" value="67" />
+          <entry key="js" value="27" />
+          <entry key="py" value="57" />
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/dashboard/models.py">
+        <entry file="file://$PROJECT_DIR$/dashboard/templates/dashboard/device_management.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="520">
-              <caret line="36" column="42" selection-start-line="36" selection-start-column="21" selection-end-line="36" selection-end-column="42" />
+            <state relative-caret-position="200">
+              <caret line="62" column="59" selection-start-line="62" selection-start-column="59" selection-end-line="62" selection-end-column="59" />
+              <folding>
+                <element signature="n#style#0;n#th#0;n#tr#0;n#thead#0;n#table#0;n#div#0;n#div#1;n#div#1;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#th#1;n#tr#0;n#thead#0;n#table#0;n#div#0;n#div#1;n#div#1;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#th#2;n#tr#0;n#thead#0;n#table#0;n#div#0;n#div#1;n#div#1;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#th#3;n#tr#0;n#thead#0;n#table#0;n#div#0;n#div#1;n#div#1;n#!!top" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/dashboard/static/dashboard/scripts/deviceMgt.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="300">
+              <caret line="132" column="69" selection-start-line="132" selection-start-column="69" selection-end-line="132" selection-end-column="69" />
+              <folding>
+                <element signature="e#0#5742#0" />
+                <element signature="e#0#5742#0" />
+                <element signature="e#0#5742#0" />
+                <element signature="e#0#3915#0" />
+                <element signature="e#0#5742#0" />
+                <element signature="e#0#5742#0" />
+                <element signature="e#0#5742#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/dashboard/static/dashboard/scripts/index.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-3829">
+              <caret line="4" column="19" lean-forward="true" selection-start-line="4" selection-start-column="19" selection-end-line="4" selection-end-column="19" />
+              <folding>
+                <element signature="e#0#17621#0" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -78,61 +159,34 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/dashboard/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-262">
-              <caret line="247" column="34" lean-forward="true" selection-start-line="247" selection-start-column="34" selection-end-line="247" selection-end-column="34" />
+            <state relative-caret-position="110">
+              <caret line="330" column="53" selection-start-line="330" selection-start-column="53" selection-end-line="330" selection-end-column="53" />
               <folding>
                 <element signature="e#0#35#0" expanded="true" />
-                <element signature="e#418#499#0" />
-                <element signature="e#5354#5494#1" />
-                <marker date="1534444573775" expanded="true" signature="8476:8560" ph="..." />
+                <element signature="e#10332#11985#0" />
+                <element signature="e#12151#12263#0" />
+                <element signature="e#12293#13337#0" />
+                <element signature="e#13394#13665#0" />
+                <element signature="e#13717#16845#0" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/dashboard/tests.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="296">
-              <caret line="111" column="51" lean-forward="true" selection-start-line="111" selection-start-column="51" selection-end-line="111" selection-end-column="51" />
-              <folding>
-                <element signature="e#0#31#0" expanded="true" />
-                <element signature="e#262#425#0" />
-                <element signature="e#478#892#0" />
-                <element signature="e#708#784#0" />
-                <element signature="e#879#1327#0" />
-                <element signature="e#1647#2301#0" />
-                <element signature="e#2367#2607#0" />
-                <element signature="e#521#631#1" />
-                <element signature="e#863#1007#1" />
-                <marker date="1534471190752" expanded="true" signature="1068:2757" ph="..." />
-                <marker date="1534471190752" expanded="true" signature="2988:2990" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/iot_dashboard/settings.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="280">
-              <caret line="94" column="63" lean-forward="true" selection-start-line="94" selection-start-column="63" selection-end-line="94" selection-end-column="63" />
-              <folding>
-                <element signature="e#314#323#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/dashboard/static/dashboard/scripts/drawCharts.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="142">
-              <caret line="647" column="39" lean-forward="true" selection-start-line="647" selection-start-column="39" selection-end-line="647" selection-end-column="39" />
-              <folding>
-                <element signature="e#0#17900#0" />
-                <element signature="e#0#17900#0" />
-              </folding>
+            <state relative-caret-position="60">
+              <caret line="3" selection-start-line="3" selection-end-line="3" selection-end-column="48" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/dashboard/urls.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="380">
+              <caret line="46" column="52" lean-forward="true" selection-start-line="46" selection-start-column="52" selection-end-line="46" selection-end-column="52" />
             </state>
           </provider>
         </entry>
@@ -159,7 +213,6 @@
       <find>update_device</find>
       <find>url</find>
       <find>homeSubmenu</find>
-      <find>datetime</find>
       <find>includeInMain</find>
       <find>color</find>
       <find>temperature</find>
@@ -171,6 +224,9 @@
       <find>arr</find>
       <find>onchange</find>
       <find>changeThre</find>
+      <find>datetime.datetime.now()</find>
+      <find>datetime.datetime</find>
+      <find>datetime</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -222,25 +278,25 @@
         <option value="$PROJECT_DIR$/dashboard/serializers.py" />
         <option value="$PROJECT_DIR$/dashboard/templates/dashboard/device_dashboard.html" />
         <option value="$PROJECT_DIR$/dashboard/static/dashboard/scripts/deviceCharts.js" />
-        <option value="$PROJECT_DIR$/dashboard/static/dashboard/scripts/index.js" />
         <option value="$PROJECT_DIR$/dashboard/selectionItems.py" />
         <option value="$PROJECT_DIR$/dashboard/templates/dashboard/index.html" />
         <option value="$PROJECT_DIR$/dashboard/templates/dashboard/includes/chart_config.html" />
-        <option value="$PROJECT_DIR$/dashboard/templates/dashboard/_header_nav.html" />
-        <option value="$PROJECT_DIR$/dashboard/static/dashboard/css/customStyles.css" />
         <option value="$PROJECT_DIR$/dashboard/templates/dashboard/chart_detail.html" />
-        <option value="$PROJECT_DIR$/dashboard/urls.py" />
         <option value="$PROJECT_DIR$/dashboard/templates/dashboard/device_management.html" />
-        <option value="$PROJECT_DIR$/dashboard/static/dashboard/scripts/deviceMgt.js" />
-        <option value="$PROJECT_DIR$/dashboard/views.py" />
         <option value="$PROJECT_DIR$/dashboard/tests.py" />
         <option value="$PROJECT_DIR$/dashboard/static/dashboard/scripts/drawCharts.js" />
+        <option value="$PROJECT_DIR$/dashboard/urls.py" />
+        <option value="$PROJECT_DIR$/dashboard/views.py" />
+        <option value="$PROJECT_DIR$/dashboard/static/dashboard/scripts/deviceMgt.js" />
+        <option value="$PROJECT_DIR$/dashboard/templates/dashboard/_header_nav.html" />
+        <option value="$PROJECT_DIR$/dashboard/static/dashboard/css/customStyles.css" />
+        <option value="$PROJECT_DIR$/dashboard/static/dashboard/scripts/index.js" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds">
-    <option name="x" value="156" />
-    <option name="y" value="37" />
+  <component name="ProjectFrameBounds" extendedState="1">
+    <option name="x" value="131" />
+    <option name="y" value="57" />
     <option name="width" value="1060" />
     <option name="height" value="642" />
   </component>
@@ -252,6 +308,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -329,7 +386,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -478,7 +534,8 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="156" y="37" width="1060" height="642" extended-state="0" />
+    <frame x="131" y="57" width="1060" height="642" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24951077" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -572,9 +629,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dashboard/templates/tags.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
+    <entry file="file://$PROJECT_DIR$/dashboard/templates/tags.py" />
     <entry file="file://$PROJECT_DIR$/dashboard/static/dashboard/css/navigation.css">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2226">
@@ -586,9 +641,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="200">
           <caret line="10" column="18" lean-forward="true" selection-start-line="10" selection-start-column="18" selection-end-line="10" selection-end-column="18" />
-          <folding>
-            <element signature="e#0#27#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -603,10 +655,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="260">
           <caret line="13" column="26" lean-forward="true" selection-start-line="13" selection-start-column="26" selection-end-line="13" selection-end-column="26" />
-          <folding>
-            <element signature="e#0#50#0" expanded="true" />
-            <marker date="1534266625111" expanded="true" signature="285:290" ph="..." />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -656,9 +704,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="313">
           <caret line="30" column="39" lean-forward="true" selection-start-line="30" selection-start-column="39" selection-end-line="30" selection-end-column="39" />
-          <folding>
-            <element signature="e#637#669#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -666,20 +711,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="780">
           <caret line="39" column="23" lean-forward="true" selection-start-line="39" selection-start-column="23" selection-end-line="39" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dashboard/templates/dashboard/_header_nav.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="243">
-          <caret line="34" column="51" lean-forward="true" selection-start-line="34" selection-start-column="51" selection-end-line="34" selection-end-column="51" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dashboard/static/dashboard/css/customStyles.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="363">
-          <caret line="20" lean-forward="true" selection-start-line="20" selection-end-line="20" />
         </state>
       </provider>
     </entry>
@@ -693,47 +724,53 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dashboard/urls.py">
+    <entry file="file://$PROJECT_DIR$/iot_dashboard/settings.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="80">
-          <caret line="19" column="24" lean-forward="true" selection-start-line="19" selection-start-column="24" selection-end-line="19" selection-end-column="24" />
-          <folding>
-            <element signature="e#0#28#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="280">
+          <caret line="94" column="63" selection-start-line="94" selection-start-column="63" selection-end-line="94" selection-end-column="63" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dashboard/static/dashboard/scripts/index.js">
+    <entry file="file://$PROJECT_DIR$/dashboard/tests.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="147">
-          <caret line="22" column="35" lean-forward="true" selection-start-line="22" selection-start-column="35" selection-end-line="22" selection-end-column="35" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dashboard/static/dashboard/scripts/deviceMgt.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="185">
-          <caret line="153" column="10" lean-forward="true" selection-start-line="153" selection-start-column="10" selection-end-line="153" selection-end-column="10" />
-          <folding>
-            <element signature="e#0#3901#0" />
-            <element signature="e#0#5048#0" />
-            <element signature="e#0#5048#0" />
-            <element signature="e#0#5048#0" />
-            <element signature="e#0#3959#0" />
-            <element signature="e#0#2590#0" />
-            <element signature="e#0#3507#0" />
-            <element signature="e#0#3507#0" />
-            <element signature="e#0#3507#0" />
-            <element signature="e#0#5391#0" />
-            <element signature="e#0#4976#0" />
-          </folding>
+        <state relative-caret-position="296">
+          <caret line="111" column="51" selection-start-line="111" selection-start-column="51" selection-end-line="111" selection-end-column="51" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/dashboard/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="520">
+        <state relative-caret-position="420">
           <caret line="36" column="42" selection-start-line="36" selection-start-column="21" selection-end-line="36" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dashboard/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="380">
+          <caret line="46" column="52" lean-forward="true" selection-start-line="46" selection-start-column="52" selection-end-line="46" selection-end-column="52" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dashboard/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="110">
+          <caret line="330" column="53" selection-start-line="330" selection-start-column="53" selection-end-line="330" selection-end-column="53" />
+          <folding>
+            <element signature="e#0#35#0" expanded="true" />
+            <element signature="e#10332#11985#0" />
+            <element signature="e#12151#12263#0" />
+            <element signature="e#12293#13337#0" />
+            <element signature="e#13394#13665#0" />
+            <element signature="e#13717#16845#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dashboard/static/dashboard/scripts/drawCharts.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="3" selection-start-line="3" selection-end-line="3" selection-end-column="48" />
         </state>
       </provider>
     </entry>
@@ -750,56 +787,53 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/iot_dashboard/settings.py">
+    <entry file="file://$PROJECT_DIR$/dashboard/static/dashboard/js/sb-admin-datatables.js">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dashboard/static/dashboard/js/sb-admin-charts.min.js">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dashboard/static/dashboard/js/sb-admin-charts.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="280">
-          <caret line="94" column="63" lean-forward="true" selection-start-line="94" selection-start-column="63" selection-end-line="94" selection-end-column="63" />
+        <state relative-caret-position="-1811" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dashboard/static/dashboard/css/customStyles.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="220">
+          <caret line="11" lean-forward="true" selection-start-line="11" selection-end-line="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dashboard/templates/dashboard/_header_nav.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1874">
+          <caret line="32" column="39" selection-start-line="32" selection-start-column="39" selection-end-line="32" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dashboard/static/dashboard/scripts/deviceMgt.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="132" column="69" selection-start-line="132" selection-start-column="69" selection-end-line="132" selection-end-column="69" />
           <folding>
-            <element signature="e#314#323#0" expanded="true" />
+            <element signature="e#0#5742#0" />
+            <element signature="e#0#5742#0" />
+            <element signature="e#0#5742#0" />
+            <element signature="e#0#3915#0" />
+            <element signature="e#0#5742#0" />
+            <element signature="e#0#5742#0" />
+            <element signature="e#0#5742#0" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dashboard/tests.py">
+    <entry file="file://$PROJECT_DIR$/dashboard/static/dashboard/scripts/index.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="296">
-          <caret line="111" column="51" lean-forward="true" selection-start-line="111" selection-start-column="51" selection-end-line="111" selection-end-column="51" />
+        <state relative-caret-position="-3829">
+          <caret line="4" column="19" lean-forward="true" selection-start-line="4" selection-start-column="19" selection-end-line="4" selection-end-column="19" />
           <folding>
-            <element signature="e#0#31#0" expanded="true" />
-            <element signature="e#262#425#0" />
-            <element signature="e#478#892#0" />
-            <element signature="e#708#784#0" />
-            <element signature="e#879#1327#0" />
-            <element signature="e#1647#2301#0" />
-            <element signature="e#2367#2607#0" />
-            <element signature="e#521#631#1" />
-            <element signature="e#863#1007#1" />
-            <marker date="1534471190752" expanded="true" signature="1068:2757" ph="..." />
-            <marker date="1534471190752" expanded="true" signature="2988:2990" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dashboard/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-262">
-          <caret line="247" column="34" lean-forward="true" selection-start-line="247" selection-start-column="34" selection-end-line="247" selection-end-column="34" />
-          <folding>
-            <element signature="e#0#35#0" expanded="true" />
-            <element signature="e#418#499#0" />
-            <element signature="e#5354#5494#1" />
-            <marker date="1534444573775" expanded="true" signature="8476:8560" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dashboard/static/dashboard/scripts/drawCharts.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="142">
-          <caret line="647" column="39" lean-forward="true" selection-start-line="647" selection-start-column="39" selection-end-line="647" selection-end-column="39" />
-          <folding>
-            <element signature="e#0#17900#0" />
-            <element signature="e#0#17900#0" />
+            <element signature="e#0#17621#0" />
           </folding>
         </state>
       </provider>

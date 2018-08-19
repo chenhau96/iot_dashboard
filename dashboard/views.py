@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.urls import reverse
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, HttpResponse
 from datetime import timedelta
 import datetime
 
@@ -18,7 +18,7 @@ def index(request):
     return render(request, 'dashboard/index.html')
 
 
-def device(request, dev_id):
+def device_dashboard(request, dev_id):
     """
     Display each device dashboard page.
     All charts for individual device will be shown.
@@ -272,12 +272,6 @@ def delete_device(request, dev_id):
     return HttpResponseRedirect(reverse('dashboard:devices_management'))
 
 
-def get_latest_data(request, dev_id):
-    device_data = Devices.objects(device_id=dev_id)[:-1]
-
-    return device_data
-
-
 def save_chart_config(request, dev_id, which_data):
     """
     To save or update the preferences configured by user
@@ -374,7 +368,6 @@ def update_show_in_main(request, dev_id, which_data):
 
                 device.chart_config.append({which_data: chart_config})
 
-
         device.save()
 
     return HttpResponseRedirect(
@@ -382,20 +375,52 @@ def update_show_in_main(request, dev_id, which_data):
                 kwargs={'dev_id': dev_id, 'which_data': which_data}))
 
 
+def get_latest_data(dev_id):
+    """
+    Get latest data from a device
+    :param dev_id:
+    :return:
+    """
+    device_data = Devices.objects(device_id=dev_id)\
+        .order_by('-timestamp').first()
+
+    return device_data
+
+
 def update_status(request, dev_id):
 
-    if request.method == 'POST':
-        device = Device.objects(device_id=dev_id).first()
-        print("Device: ", device)
-        status = request.POST['status']
+    if request.method == 'GET':
+        latest_data = get_latest_data(dev_id)
 
-        device.status = status
+        if latest_data:
+            print("Latest data: ", latest_data)
+            device = Device.objects(device_id=dev_id).first()
 
-        device.save()
+            # Get time difference
+            time_diff = datetime.datetime.now() - latest_data.timestamp
+            print("Time difference: ", time_diff.days)
+
+            if time_diff.days >= 1:
+                # Time difference more than 1 day
+                # Set status to offline
+                device.status = "offline"
+            else:
+                # Time difference less than 1 day
+                # Set status to online
+                device.status = "online"
+
+            device.save()
+
+            return HttpResponse(device.status)
+        else:
+            return HttpResponse("Fail")
 
     return HttpResponseRedirect(reverse('dashboard:devices_management'))
 
 
+##
+# API endpoint section
+##
 class DeviceConfigViewSet(viewsets.ModelViewSet):
     """
     API endpoint for device configuration setting
