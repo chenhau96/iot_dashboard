@@ -4,16 +4,19 @@
 
 {% block content %}
 <script>
-    // Get device id passed from backend
+    // Get device id and data key passed from backend
     var device_id = "{{ device_id }}";
+    var data_keys = {{ data_keys | safe }};
+    console.log(data_keys);
 
     // Generate dummy url for chart detail page
     var chart_detail_url = "{% url 'dashboard:chart_detail' dev_id=device_id which_data="data" %}"
 </script>
 <script src="{% static 'dashboard/scripts/deviceCharts.js' %}"></script>
 
+<div id="device-charts">
 
-<div class="device-charts"></div>
+</div>
 
 
 {% endblock %}

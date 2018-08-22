@@ -1,150 +1,630 @@
 
 var parsedData;
+var dev_config;
+
+var row;
+var chartCount = 0;
+var count = 0;
+
+var updateFlag = false;
+var chartTitle = "";
 var ttFormatTime = d3.timeFormat("%d-%m-%Y %X");
-var iconCels = "\u2103";
-var interval = 5000;
+var transitionDuration = 1000; // 1000ms
+var red = "#e60000", blue = "#000066";  // color hex code
+
+// Chart width and height setting
+var svgWidth = 300, svgHeight = 200;
+var margin = { top: 10, right: 10, bottom: 50, left: 40 };
+var width = svgWidth - margin.left - margin.right;
+var height = svgHeight - margin.top - margin.bottom;
+var width_mid = width / 2;
+var height_mid = height / 2;
+
+// API URL for device configuration
+var deviceConfigAPI = 'http://localhost:8000/api/device-config/?device_id=' + device_id;
 
 document.addEventListener("DOMContentLoaded", function(event) {
-  var api = 'http://localhost:8000/api/devices/?device_id=' + device_id;
+  // First rendering of chart and get device configuration
+  // Device config and other info are saved into session
+  fetchDeviceConfig(deviceConfigAPI);
 
-  // Set an interval to update the charts without reloading the page
-  //setInterval(function() {
-      fetchDataFromAPI(api);
-  //   },
-  //   interval);
+  // Update charts using information saved in session
+  // in an interval of 30s
+  setInterval(function() {
+    updateFlag = true;
+    for (var i = 1; i <= count; i++) {
+      var sessionObj = JSON.parse(sessionStorage.getItem("device_chart_" + i));
+
+      fetchDataFromAPI(sessionObj);
+    }
+    console.log("Finished updating.");
+  }, 30000);
 });
 
-function fetchDataFromAPI(api) {
+function fetchDeviceConfig(api) {
   fetch(api)
     .then(function(response) { return response.json(); })
     .then(function(apiData) {
-      //console.log(data[0].data);
-      for (var whichData in apiData[0].data) {
-          parsedData = parseData(apiData, whichData)
-          drawLineChart(parsedData, whichData);
+      if (apiData) {
+        var index = 0;
+
+        // Get the device_id, device_name, data
+        var device_id = apiData[index].device_id;
+        var device_name = apiData[index].device_name;
+        console.log(device_name);
+
+        for (var key = 0; key < data_keys.length; key++) {
+          var chart_config = {};
+          var data = apiData[index].chart_config[key];
+          if (!data) {
+            // if key not in chart_config array,
+            // there's no saved chart_config on that key
+            // then use default config
+            console.log("This data " + data_keys[key] + " does not have chart_config");
+            chart_config = {
+              threshold: apiData[index].default_config.threshold,
+              color: apiData[index].default_config.color,
+              chart_type: apiData[index].default_config.chart_type,
+              timestamp: apiData[index].default_config.timeline,
+            };
+            console.log("Default config " + chart_config);
+            data = data_keys[key];
+          }
+          else {
+            data = Object.keys(data);
+            console.log("Current whichData: " + data);
+
+            // Get the chart config of the current device
+            chart_config = {
+              threshold: apiData[index].chart_config[key][data].threshold,
+              color: apiData[index].chart_config[key][data].color,
+              chart_type: apiData[index].chart_config[key][data].chart_type,
+              timestamp: apiData[index].chart_config[key][data].timeline,
+            };
+          }
+
+          // Construct the API URL to get device data
+          var data_api = 'http://localhost:8000/api/devices/?device_id=' +
+            device_id + '&data=' + data + '&timestamp=' + chart_config.timestamp;
+
+          // Wrap all the necessary information
+          var wrapperObj = {
+            "device_id": device_id,
+            "device_name": device_name,
+            "whichData": data,
+            "chart_config": chart_config,
+            "data_api": data_api,
+          }
+          console.log(wrapperObj);
+
+          // Store wrapperObj information into session storage
+          // for update chart purpose
+          count++;
+          sessionStorage.setItem("device_chart_" + count, JSON.stringify(wrapperObj));
+
+          //fetchDataFromAPI(data_api, device_id, data, chart_config)
+          fetchDataFromAPI(wrapperObj);
+        }
       }
     })
 }
 
-function parseData(data, whichData) {
+function parseData(apiData, whichData) {
   var arr = [];
-  for (var i in data) {
-    var datetime = new Date(data[i].timestamp);
+
+  for (var i in apiData) {
+    // Convert API string date to Date object
+    var datetime = new Date(apiData[i].timestamp);
+
+    // Convert to local datetime
+    var localDateTime = datetime.getTime() - (datetime.getTimezoneOffset() * 60000);
+
+    // Push the essential data to an array
     arr.push(
-       {
-           ts: datetime,
-           temperature: data[i].data[whichData],
-       }
+      {
+        ts: localDateTime,
+        data_point: apiData[i].data[whichData],
+      }
     );
   }
   return arr;
 }
 
-function drawLineChart(data, whichData) {
+function fetchDataFromAPI(wrapperObj) {
+  fetch(wrapperObj.data_api)
+    .then(function(response) { return response.json(); })
+    .then(function(apiData) {
+      if (apiData.length == 0) {
+        console.log("Device " + wrapperObj.device_id + "'s "
+          + wrapperObj.whichData + " has no data");
+      }
+      else {
+        parsedData = parseData(apiData, wrapperObj.whichData);
+
+        if (updateFlag) {
+          // Update chart
+          updateWhichChart(wrapperObj, parsedData);
+        }
+        else {
+          // Draw chart
+          generateCard(wrapperObj.device_id, wrapperObj.device_name,
+            wrapperObj.whichData);
+          drawWhichChart(wrapperObj, parsedData);
+        }
+      }
+    })
+}
+
+// Function to generate card to hold each chart
+function generateCard(device_id, device_name, whichData) {
+  whichData = whichData + "";
+
   // Make first letter of each data uppercase, to become the chart title
   var firstLetterUpper = whichData.charAt(0).toUpperCase();
-  var chartTitle = firstLetterUpper + whichData.substr(1);
+  chartTitle = firstLetterUpper + whichData.substr(1);
+  chartTitle = device_name + " - " + chartTitle;
 
   // Generate the url for each chart, to link to chart detail page
-  var url = chart_detail_url.replace("data", whichData);
+  var chart_detail_url = "http://localhost:8000/dashboard/device/" +
+    device_id + "/" + whichData;
 
   // Generate a card skeleton to hold chart title and the chart
-  var div = d3.select(".device-charts")
+  // Each row only holds 3 charts
+  if (chartCount % 3 == 0) {
+    row = d3.select("#device-charts")
     .append("div")
-    .attr("class", "row")
-      .append("div")
-      .attr("class", "col-lg-8")
+    .attr("class", "row");
+  }
+
+  var div = row.append("div")
+      .attr("class", "col-md-4 mb-3")
         .append("div")
-        .attr("class", "card mb-3");
+        .attr("class", "card");
 
   // Card header to hold the chart title
   var card_header = div.append("h6")
     .attr("class", "card-header")
 
   card_header.append("a")
-    .attr("href", url)
+    .attr("href", chart_detail_url)
     .text(chartTitle);
 
   // Card body to hold the chart
   div.append("div")
-    .attr("class", "card-body")
-    .attr("id", whichData);
+    .attr("class", "card-body svg-container")
+    .attr("id", whichData + "_" + device_id);
 
-  var svgWidth = 650, svgHeight = 400;
-  var margin = { top: 20, right: 20, bottom: 50, left: 80 };
-  var width = svgWidth - margin.left - margin.right;
-  var height = svgHeight - margin.top - margin.bottom;
-  var width_mid = width / 2;
-  var height_mid = height / 2;
+  // Increment chart count
+  chartCount++;
+}
 
-  var svg = d3.select('#' + whichData)
+// Function to process which chart type to draw
+function drawWhichChart(wrapperObj, data) {
+  switch(wrapperObj.chart_config.chart_type) {
+    case 'scatterplot':
+      drawScatterPlot(wrapperObj, data);
+      break;
+    case 'linechart':
+    default:
+      drawLineChart(wrapperObj, data);
+  }
+}
+
+// Function to process which chart type to draw
+function updateWhichChart(wrapperObj, data) {
+  switch(wrapperObj.chart_config.chart_type) {
+    case 'scatterplot':
+      updateScatterPlot(wrapperObj, data);
+      break;
+    case 'linechart':
+    default:
+      updateLineChart(wrapperObj, data);
+  }
+}
+
+// Line Chart
+function drawLineChart(wrapperObj, data) {
+  // Remove existing svg if any
+  //d3.select("svg").remove();
+
+  // Set svg width and height
+  var svg = d3.select("#" + wrapperObj.whichData + "_" + wrapperObj.device_id)
     .append("svg")
-    .attr("width", svgWidth)
-    .attr("height", svgHeight);
+    .attr("preserveAspectRatio", "xMinYMin meet")
+    .attr("viewBox", "0 0 " + svgWidth + " " + svgHeight)
+    //class to make it responsive
+    .classed("svg-content-responsive", true);
 
+  // Set the chart position within the svg
   var g = svg.append("g")
-  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("class", "chart")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+  // scale the range of x-axis
   var x = d3.scaleTime()
-  .domain(d3.extent(data, function(d) { return d.ts }))
-  .range([0, width]);
+    .domain(d3.extent(data, function(d) { return d.ts }))
+    .range([0, width]);
 
+  // scale the range of y-axis
   var y = d3.scaleLinear()
-  .domain(d3.extent(data, function(d) { return d.temperature }))
-  .range([height, 0]);
+    .domain(d3.extent(data, function(d) { return d.data_point }))
+    .range([height, 0]);
 
+  // define x-axis
   var xAxis = d3.axisBottom(x)
-  //.ticks(d3.timeHour.every(24))
-  .tickSize(8);   // length of the each tick
-  //.tickFormat(d3.timeFormat("%m-%d"));
+    .ticks(5)
+    .tickSize(8)   // length of the each tick
+    .tickPadding(5);
+    //.ticks(d3.timeHour.every(24))
+    //.tickFormat(d3.timeFormat("%m-%d"));
 
+  // define y-axis
   var yAxis = d3.axisLeft(y)
-  .tickSize(8);
+    .ticks(5)
+    .tickSize(8)
+    .tickPadding(5);
 
+  // d3's line generator
   var line = d3.line()
+    .curve(d3.curveLinear)
     .x(function(d) { return x(d.ts)})
-    .y(function(d) { return y(d.temperature)});
+    .y(function(d) { return y(d.data_point)});
 
-  // append x-axis and label
+  // append x-axis and label in a group tag
   g.append("g")
+    .attr("class", "x-axis")
     .attr("transform", "translate(0," + height + ")")
-    .call(xAxis)
-    .append("text")
-    .attr("class", "text-label")
-    .attr("fill", "#000")
-    .attr("transform", "translate(" + width_mid + ", " + 40 + ")")
-    .attr("text-anchor", "middle")
-    .text("Timeline");
+    .call(xAxis);
 
-  // append y-axis and label
+  // append y-axis and label in a group tag
   g.append("g")
-    .call(yAxis)
-    .append("text")
-    .attr("class", "text-label")
-    .attr("fill", "#000")
-    .attr("x", 60 - height_mid)
-    .attr("y", 30 - margin.left)
-    .attr("transform", "rotate(-90)")
-    .attr("text-anchor", "end")
-    .text(whichData);
+    .attr("class", "y-axis")
+    .call(yAxis);
 
+  // add line path of the line chart
   g.append("path")
     .datum(data)
-    .attr("fill", "none")
-    .attr("stroke", "steelblue")
     .attr("class", "line")
+    .attr("fill", "none")
+    .attr("stroke", wrapperObj.chart_config.color)
     .attr("stroke-width", 1.5)
-    .attr("d", line);
+    .attr("d", line(data));
 
+  // Add tooltip
+  var div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("display", "none")
+    .style("opacity", 0);
+
+  // add data points to the line
   g.selectAll("circle").data(data).enter()
     .append("circle")
+    .attr("class", "dotPoint")
     .attr("r", 4)
     .attr("cx", (d, i) => x(d.ts))
-    .attr("cy", (d, i) => y(d.temperature));
+    .attr("cy", (d, i) => y(d.data_point))
+    .attr("fill", (d) => {
+      // if beyond threshold, change data point's color to red
+      return (d.data_point >= wrapperObj.chart_config.threshold) ? red : blue;
+    })
+    // Tooltip mouseover
+    .on("mouseover", function(d) {
+      div.transition()
+        .duration(200)
+        .style("display", "inline")
+        .style("opacity", .9);
+      div.html(ttFormatTime(d.ts) + "<br/>" +
+        "<b>" + d.data_point.toFixed(2) + "</b>")
+          .style("left", (d3.event.pageX) + "px")
+          .style("top", (d3.event.pageY - 28) + "px");
+      })
+    .on("mouseout", function(d) {
+      div.transition()
+        .duration(500)
+        .style("opacity", 0);
+    });
 }
 
-function updateChart() {
+// Update Line Chart
+function updateLineChart(wrapperObj, data) {
+  console.log("Updating linechart on " + wrapperObj.device_name
+    + "-" + wrapperObj.whichData);
 
+  // Scale the x and y axis again
+  var x = d3.scaleTime()
+    .domain(d3.extent(data, function(d) { return d.ts }))
+    .range([0, width]);
+
+  var y = d3.scaleLinear()
+    .domain(d3.extent(data, function(d) { return d.data_point }))
+    .range([height, 0]);
+
+  // Define the x and y axis
+  var xAxis = d3.axisBottom(x)
+    .ticks(5)
+    .tickSize(8) // length of the each tick
+    .tickPadding(5);
+
+  var yAxis = d3.axisLeft(y)
+    .ticks(5)
+    .tickSize(8)
+    .tickPadding(5);
+
+  // Generate the line
+  var line = d3.line()
+    .curve(d3.curveLinear)
+    .x(function(d) { return x(d.ts)})
+    .y(function(d) { return y(d.data_point)});
+
+  var svg =
+    d3.select("#" + wrapperObj.whichData + "_" + wrapperObj.device_id)
+      .select("svg");
+  var path = svg.select(".chart").selectAll("path.line");
+
+  /** Update Line **/
+  // Update new line path to the chart
+  path
+    .data(data)
+    .enter()
+    .append("path")
+    .merge(path)
+    .attr("class", "line")
+    .style("fill", "none")
+    .transition()
+    .duration(1000)
+    .attrTween("d", function() {
+      // Do interpolation on previous data for a smooth transition
+      var previous = d3.select(this).attr("d");
+      var current = line(data);
+      return d3.interpolatePath(previous, current);
+    });
+
+  // Delete the old line path from the chart
+  path.exit().remove();
+
+  // Update the x-axis
+  svg.select(".x-axis")
+    .transition()
+    .duration(transitionDuration)
+    .call(xAxis);
+
+  // Update the y-axis
+  svg.select(".y-axis")
+    .transition()
+    .duration(transitionDuration)
+    .call(yAxis);
+
+  /** Update Circle **/
+  // Update existing data points
+  svg.selectAll("circle").data(data)
+    .attr("class", "dotPoint")
+    .attr("r", 4)
+    .attr("cx", (d, i) => x(d.ts))
+    .attr("cy", (d, i) => y(d.data_point))
+    .attr("fill", (d) => {
+      // if beyond threshold, change data point's color to red
+      return (d.data_point >= wrapperObj.chart_config.threshold) ? red : blue;
+    })
+    .transition()
+    .duration(transitionDuration);
+
+  // Add tooltip
+  var div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("display", "none")
+    .style("opacity", 0);
+
+  // Create new data points, if there is new data
+  svg.selectAll("circle").data(data)
+    .enter()
+    .append("circle")
+    .attr("class", "dotPoint")
+    .attr("r", 4)
+    .attr("cx", (d, i) => x(d.ts))
+    .attr("cy", (d, i) => y(d.data_point))
+    .attr("fill", (d) => {
+      // if beyond threshold, change data point's color to red
+      return (d.data_point >= wrapperObj.chart_config.threshold) ? red : blue;
+    })
+    .on("mouseover", function(d) {
+      div.transition()
+        .duration(200)
+        .style("display", "inline")
+        .style("opacity", .9);
+      div.html(ttFormatTime(d.ts) + "<br/>" +
+        "<b>" + d.data_point.toFixed(2) + "</b>")
+          .style("left", (d3.event.pageX) + "px")
+          .style("top", (d3.event.pageY - 28) + "px");
+      })
+    .on("mouseout", function(d) {
+      div.transition()
+        .duration(500)
+        .style("opacity", 0);
+    });
+
+  // Remove old data points
+  svg.selectAll("circle")
+    .data(data)
+    .exit()
+    .remove();
 }
 
+// Scatterplot
+function drawScatterPlot(wrapperObj, data) {
+  // Remove existing svg if any
+  //d3.select("svg").remove();
 
+  var svg = d3.select("#" + wrapperObj.whichData + "_" + wrapperObj.device_id)
+    .append("svg")
+    .attr("preserveAspectRatio", "xMinYMin meet")
+    .attr("viewBox", "0 0 " + svgWidth + " " + svgHeight)
+    //class to make it responsive
+    .classed("svg-content-responsive", true);
+
+  var chart = svg.append("g")
+    .attr("class", "chart")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  // scale the range of x-axis
+  var x = d3.scaleTime()
+    .domain(d3.extent(data, function(d) { return d.ts }))
+    .range([0, width]);
+
+  // scale the range of y-axis
+  var y = d3.scaleLinear()
+    .domain(d3.extent(data, function(d) { return d.data_point }))
+    .range([height, 0]);
+
+  // define x-axis
+  var xAxis = d3.axisBottom(x)
+    .ticks(5)
+    .tickSize(8)   // length of the each tick
+    .tickPadding(5);
+
+  // define y-axis
+  var yAxis = d3.axisLeft(y)
+    .ticks(5)
+    .tickSize(8)
+    .tickPadding(5);
+
+    // append x-axis and label in a group tag
+  chart.append("g")
+    .attr("class", "x-axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis);
+
+  // append y-axis and label in a group tag
+  chart.append("g")
+    .attr("class", "y-axis")
+    .call(yAxis);
+
+  // Add tooltip
+  var div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("display", "none")
+    .style("opacity", 0);
+
+  // add data points to the line
+  chart.selectAll("circle").data(data).enter()
+    .append("circle")
+    .attr("class", "dotPoint")
+    .attr("r", 4)
+    .attr("cx", (d, i) => x(d.ts))
+    .attr("cy", (d, i) => y(d.data_point))
+    .attr("fill", (d) => {
+      // if beyond threshold, change data point's color to red
+      return (d.data_point >= wrapperObj.chart_config.threshold) ? red : blue;
+    })
+    // Tooltip mouseover
+    .on("mouseover", function(d) {
+      div.transition()
+        .duration(200)
+        .style("display", "inline")
+        .style("opacity", .9);
+      div.html(ttFormatTime(d.ts) + "<br/>" +
+        "<b>" + d.data_point.toFixed(2) + "</b>")
+          .style("left", (d3.event.pageX) + "px")
+          .style("top", (d3.event.pageY - 28) + "px");
+      })
+    .on("mouseout", function(d) {
+      div.transition()
+        .duration(500)
+        .style("opacity", 0);
+    });
+}
+
+// Update Scatterplot
+function updateScatterPlot(wrapperObj, data) {
+  console.log("Updating scatterplot on " + wrapperObj.device_name
+    + "-" + wrapperObj.whichData);
+
+  // Scale the x and y axis again
+  var x = d3.scaleTime()
+    .domain(d3.extent(data, function(d) { return d.ts }))
+    .range([0, width]);
+
+  var y = d3.scaleLinear()
+    .domain(d3.extent(data, function(d) { return d.data_point }))
+    .range([height, 0]);
+
+  // Define the x and y axis
+  var xAxis = d3.axisBottom(x)
+    .ticks(5)
+    .tickSize(8) // length of the each tick
+    .tickPadding(5);
+
+  var yAxis = d3.axisLeft(y)
+    .ticks(5)
+    .tickSize(8)
+    .tickPadding(5);
+
+  var svg =
+    d3.select("#" + wrapperObj.whichData + "_" + wrapperObj.device_id)
+      .select("svg");
+
+    // Update the x-axis
+  svg.select(".x-axis")
+    .transition()
+    .duration(transitionDuration)
+    .call(xAxis);
+
+  // Update the y-axis
+  svg.select(".y-axis")
+    .transition()
+    .duration(transitionDuration)
+    .call(yAxis);
+
+  /** Update Circle **/
+  // Update existing data points
+  svg.select(".chart").selectAll("circle").data(data)
+    .attr("class", "dotPoint")
+    .attr("r", 4)
+    .attr("cx", (d, i) => x(d.ts))
+    .attr("cy", (d, i) => y(d.data_point))
+    .attr("fill", (d) => {
+      // if beyond threshold, change data point's color to red
+      return (d.data_point >= wrapperObj.chart_config.threshold) ? red : blue;
+    })
+    .transition()
+    .duration(transitionDuration);
+
+  // Add tooltip
+  var div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("display", "none")
+    .style("opacity", 0);
+
+  // Create new data points, if there is new data
+  svg.select(".chart").selectAll("circle").data(data)
+    .enter()
+    .append("circle")
+    .attr("class", "dotPoint")
+    .attr("r", 4)
+    .attr("cx", (d, i) => x(d.ts))
+    .attr("cy", (d, i) => y(d.data_point))
+    .attr("fill", (d) => {
+      // if beyond threshold, change data point's color to red
+      return (d.data_point >= wrapperObj.chart_config.threshold) ? red : blue;
+    })
+    .on("mouseover", function(d) {
+      div.transition()
+        .duration(200)
+        .style("display", "inline")
+        .style("opacity", .9);
+      div.html(ttFormatTime(d.ts) + "<br/>" +
+        "<b>" + d.data_point.toFixed(2) + "</b>")
+          .style("left", (d3.event.pageX) + "px")
+          .style("top", (d3.event.pageY - 28) + "px");
+      })
+    .on("mouseout", function(d) {
+      div.transition()
+        .duration(500)
+        .style("opacity", 0);
+    });
+
+  // Remove old data points
+  svg.select(".chart").selectAll("circle")
+    .data(data)
+    .exit()
+    .remove();
+}

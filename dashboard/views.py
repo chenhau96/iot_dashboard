@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from datetime import timedelta
-import datetime
+import datetime, json
 
 from dashboard.models import Devices, Device, ChartConfig
 from dashboard.selectionItems import *
@@ -22,19 +22,24 @@ def device_dashboard(request, dev_id):
     """
     Display each device dashboard page.
     All charts for individual device will be shown.
-
     :param request: request object
     :param dev_id: device id
     :return:
     """
+    # Get device object with device id = dev_id to ensure the
+    # device id is valid
     current_device = Device.objects(device_id=dev_id)
     if not current_device:
         # if device_id not found, raise Http404
         raise Http404("Device ID \"" + dev_id + "\" does not exist")
     else:
+        device_data = Devices.objects(device_id=dev_id).first()
+        data_keys = device_data.data.keys()
+        print("Data keys: ", data_keys)
+
         # if device_id is found, render the page
         return render(request, 'dashboard/device_dashboard.html',
-                      {'device_id': dev_id, })
+                      {'device_id': dev_id, 'data_keys': list(data_keys)})
 
 
 def chart_detail(request, dev_id, which_data):
@@ -356,6 +361,7 @@ def update_show_in_main(request, dev_id, which_data):
                 break
             elif which_data == field and not toShow:
                 device.chart_config[i][field]['show_in_main'] = False
+                break
             elif not isExist and i == len(device.chart_config) - 1:
                 # Create a ChartConfig object
                 chart_config = ChartConfig(
@@ -388,7 +394,13 @@ def get_latest_data(dev_id):
 
 
 def update_status(request, dev_id):
-
+    """
+    Update device status and return device status to the
+    device management table.
+    :param request:
+    :param dev_id:
+    :return:
+    """
     if request.method == 'GET':
         latest_data = get_latest_data(dev_id)
 
@@ -431,6 +443,17 @@ class DeviceConfigViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = Device.objects.order_by('device_id')
+
+        device_id = self.request.query_params.get('device_id', None)
+
+        if device_id is not None:
+            """
+            Filter queryset to retrieve a specific device_id
+            if 'device_id' request param present in API url parameter
+
+            E.g. http://localhost:8000/api/device-config/?device_id=00-80-00-00-00-01-1e-d7
+            """
+            queryset = queryset.filter(device_id=device_id)
 
         return queryset
 

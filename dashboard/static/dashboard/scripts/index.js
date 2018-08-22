@@ -4,6 +4,7 @@ var dev_config;
 
 var row;
 var chartCount = 0;
+var count = 0;
 
 var updateFlag = false;
 var chartTitle = "";
@@ -12,8 +13,8 @@ var transitionDuration = 1000; // 1000ms
 var red = "#e60000", blue = "#000066";  // color hex code
 
 // Chart width and height setting
-var svgWidth = 300, svgHeight = 190;
-var margin = { top: 10, right: 10, bottom: 20, left: 30 };
+var svgWidth = 300, svgHeight = 200;
+var margin = { top: 10, right: 10, bottom: 50, left: 40 };
 var width = svgWidth - margin.left - margin.right;
 var height = svgHeight - margin.top - margin.bottom;
 var width_mid = width / 2;
@@ -23,9 +24,21 @@ var height_mid = height / 2;
 var deviceConfigAPI = 'http://localhost:8000/api/device-config/';
 
 document.addEventListener("DOMContentLoaded", function(event) {
-
+  // First rendering of chart and get device configuration
+  // Device config and other info are saved into session
   fetchDeviceConfig(deviceConfigAPI);
 
+  // Update charts using information saved in session
+  // in an interval of 30s
+  setInterval(function() {
+    updateFlag = true;
+    for (var i = 1; i <= count; i++) {
+      var sessionObj = JSON.parse(sessionStorage.getItem("chart_" + i));
+
+      fetchDataFromAPI(sessionObj);
+    }
+    console.log("Finished updating.");
+  }, 30000);
 });
 
 function fetchDeviceConfig(api) {
@@ -40,26 +53,49 @@ function fetchDeviceConfig(api) {
         if (dev_config) {
           for (var obj in dev_config) {
             for (var whichData in dev_config[obj].chart_config) {
-              // Get the device_id, data, timestamp
+
+              // Get the device_id, device_name, data
               var device_id = dev_config[obj].device_id;
+              var device_name = dev_config[obj].device_name;
+              console.log(device_name);
               var data = dev_config[obj].chart_config[whichData];
               data = Object.keys(data);
-              var timestamp = dev_config[obj].chart_config[whichData][data].timeline;
+              console.log("Current whichData: " + data);
 
+              // Get the chart config of the current device
               var chart_config = {
                 threshold: dev_config[obj].chart_config[whichData][data].threshold,
                 color: dev_config[obj].chart_config[whichData][data].color,
                 chart_type: dev_config[obj].chart_config[whichData][data].chart_type,
+                timestamp: dev_config[obj].chart_config[whichData][data].timeline,
               };
 
 
               // Construct the API URL to get device data
               var data_api = 'http://localhost:8000/api/devices/?device_id=' +
-                device_id + '&data=' + data + '&timestamp=' + timestamp;
+                device_id + '&data=' + data + '&timestamp=' + chart_config.timestamp;
 
-              fetchDataFromAPI(data_api, device_id, data, chart_config)
+              // Wrap all the necessary information
+              var wrapperObj = {
+                "device_id": device_id,
+                "device_name": device_name,
+                "whichData": data,
+                "chart_config": chart_config,
+                "data_api": data_api,
+              }
+              console.log(wrapperObj);
+
+              // Store wrapperObj information into session storage
+              // for update chart purpose
+              count++;
+              sessionStorage.setItem("chart_" + count, JSON.stringify(wrapperObj));
+
+
+              //fetchDataFromAPI(data_api, device_id, data, chart_config)
+              fetchDataFromAPI(wrapperObj);
             }
           }
+
         }
       }
     })
@@ -81,6 +117,7 @@ function getDeviceConfig(apiData) {
   for (var i in apiData) {
     // Get each object device ID
     configForShowMain.device_id = apiData[i].device_id;
+    configForShowMain.device_name = apiData[i].device_name;
 
     // Get each object chart_config
     for (var whichConfig in apiData[i].chart_config) {
@@ -130,35 +167,45 @@ function parseData(apiData, whichData) {
   return arr;
 }
 
-function fetchDataFromAPI(api, device_id, whichData, chart_config) {
-  fetch(api)
+function fetchDataFromAPI(wrapperObj) {
+  fetch(wrapperObj.data_api)
     .then(function(response) { return response.json(); })
     .then(function(apiData) {
       if (apiData.length == 0) {
-        alert("No data is retrieved.");
+        console.log("Device " + wrapperObj.device_id + "'s " + wrapperObj.whichData + " has no data");
       }
       else {
-        parsedData = parseData(apiData, whichData);
+        parsedData = parseData(apiData, wrapperObj.whichData);
 
-        generateCard(device_id, whichData);
-        drawWhichChart(chart_config, whichData, parsedData);
+        if (updateFlag) {
+          // Update chart
+          updateWhichChart(wrapperObj, parsedData);
+        }
+        else {
+          // Draw chart
+          generateCard(wrapperObj.device_id, wrapperObj.device_name,
+            wrapperObj.whichData);
+          drawWhichChart(wrapperObj, parsedData);
+        }
       }
     })
 }
 
 // Function to generate card to hold each chart
-function generateCard(device_id, whichData) {
+function generateCard(device_id, device_name, whichData) {
   whichData = whichData + "";
 
   // Make first letter of each data uppercase, to become the chart title
   var firstLetterUpper = whichData.charAt(0).toUpperCase();
   chartTitle = firstLetterUpper + whichData.substr(1);
+  chartTitle = device_name + " - " + chartTitle;
 
   // Generate the url for each chart, to link to chart detail page
   var chart_detail_url = "http://localhost:8000/dashboard/device/" +
     device_id + "/" + whichData;
 
   // Generate a card skeleton to hold chart title and the chart
+  // Each row only holds 3 charts
   if (chartCount % 3 == 0) {
     row = d3.select("#device-charts")
     .append("div")
@@ -180,47 +227,49 @@ function generateCard(device_id, whichData) {
 
   // Card body to hold the chart
   div.append("div")
-    .attr("class", "card-body p-3")
-    .attr("id", whichData);
+    .attr("class", "card-body svg-container")
+    .attr("id", whichData + "_" + device_id);
 
+  // Increment chart count
   chartCount++;
 }
 
 // Function to process which chart type to draw
-function drawWhichChart(chart_config, whichData, data) {
-  switch(chart_config.chart_type) {
+function drawWhichChart(wrapperObj, data) {
+  switch(wrapperObj.chart_config.chart_type) {
     case 'scatterplot':
-      drawScatterPlot(chart_config, whichData, data);
+      drawScatterPlot(wrapperObj, data);
       break;
     case 'linechart':
     default:
-      drawLineChart(chart_config, whichData, data);
+      drawLineChart(wrapperObj, data);
   }
 }
 
 // Function to process which chart type to draw
-function updateWhichChart(chart_type, data) {
-  switch(chart_type) {
+function updateWhichChart(wrapperObj, data) {
+  switch(wrapperObj.chart_config.chart_type) {
     case 'scatterplot':
-      updateScatterPlot(data);
+      updateScatterPlot(wrapperObj, data);
       break;
     case 'linechart':
     default:
-      updateLineChart(data);
+      updateLineChart(wrapperObj, data);
   }
 }
 
 // Line Chart
-function drawLineChart(chart_config, whichData, data) {
-  console.log(chart_config);
+function drawLineChart(wrapperObj, data) {
   // Remove existing svg if any
   //d3.select("svg").remove();
 
   // Set svg width and height
-  var svg = d3.select("#" + whichData)
+  var svg = d3.select("#" + wrapperObj.whichData + "_" + wrapperObj.device_id)
     .append("svg")
-    .attr("width", svgWidth)
-    .attr("height", svgHeight);
+    .attr("preserveAspectRatio", "xMinYMin meet")
+    .attr("viewBox", "0 0 " + svgWidth + " " + svgHeight)
+    //class to make it responsive
+    .classed("svg-content-responsive", true);
 
   // Set the chart position within the svg
   var g = svg.append("g")
@@ -273,7 +322,7 @@ function drawLineChart(chart_config, whichData, data) {
     .datum(data)
     .attr("class", "line")
     .attr("fill", "none")
-    .attr("stroke", chart_config.color)
+    .attr("stroke", wrapperObj.chart_config.color)
     .attr("stroke-width", 1.5)
     .attr("d", line(data));
 
@@ -292,7 +341,7 @@ function drawLineChart(chart_config, whichData, data) {
     .attr("cy", (d, i) => y(d.data_point))
     .attr("fill", (d) => {
       // if beyond threshold, change data point's color to red
-      return (d.data_point >= chart_config.threshold) ? red : blue;
+      return (d.data_point >= wrapperObj.chart_config.threshold) ? red : blue;
     })
     // Tooltip mouseover
     .on("mouseover", function(d) {
@@ -313,7 +362,10 @@ function drawLineChart(chart_config, whichData, data) {
 }
 
 // Update Line Chart
-function updateLineChart(data) {
+function updateLineChart(wrapperObj, data) {
+  console.log("Updating linechart on " + wrapperObj.device_name
+    + "-" + wrapperObj.whichData);
+
   // Scale the x and y axis again
   var x = d3.scaleTime()
     .domain(d3.extent(data, function(d) { return d.ts }))
@@ -340,8 +392,10 @@ function updateLineChart(data) {
     .x(function(d) { return x(d.ts)})
     .y(function(d) { return y(d.data_point)});
 
-  var svg = d3.select("svg").transition();
-  var path = d3.selectAll("path.line");
+  var svg =
+    d3.select("#" + wrapperObj.whichData + "_" + wrapperObj.device_id)
+      .select("svg");
+  var path = svg.select(".chart").selectAll("path.line");
 
   /** Update Line **/
   // Update new line path to the chart
@@ -351,6 +405,7 @@ function updateLineChart(data) {
     .append("path")
     .merge(path)
     .attr("class", "line")
+    .style("fill", "none")
     .transition()
     .duration(1000)
     .attrTween("d", function() {
@@ -365,24 +420,26 @@ function updateLineChart(data) {
 
   // Update the x-axis
   svg.select(".x-axis")
+    .transition()
     .duration(transitionDuration)
     .call(xAxis);
 
   // Update the y-axis
   svg.select(".y-axis")
+    .transition()
     .duration(transitionDuration)
     .call(yAxis);
 
   /** Update Circle **/
   // Update existing data points
-  d3.select(".chart").selectAll("circle").data(data)
+  svg.selectAll("circle").data(data)
     .attr("class", "dotPoint")
     .attr("r", 4)
     .attr("cx", (d, i) => x(d.ts))
     .attr("cy", (d, i) => y(d.data_point))
     .attr("fill", (d) => {
       // if beyond threshold, change data point's color to red
-      return (d.data_point >= chart_config.threshold) ? red : blue;
+      return (d.data_point >= wrapperObj.chart_config.threshold) ? red : blue;
     })
     .transition()
     .duration(transitionDuration);
@@ -394,7 +451,7 @@ function updateLineChart(data) {
     .style("opacity", 0);
 
   // Create new data points, if there is new data
-  d3.select(".chart").selectAll("circle").data(data)
+  svg.selectAll("circle").data(data)
     .enter()
     .append("circle")
     .attr("class", "dotPoint")
@@ -403,7 +460,7 @@ function updateLineChart(data) {
     .attr("cy", (d, i) => y(d.data_point))
     .attr("fill", (d) => {
       // if beyond threshold, change data point's color to red
-      return (d.data_point >= chart_config.threshold) ? red : blue;
+      return (d.data_point >= wrapperObj.chart_config.threshold) ? red : blue;
     })
     .on("mouseover", function(d) {
       div.transition()
@@ -422,21 +479,23 @@ function updateLineChart(data) {
     });
 
   // Remove old data points
-  d3.select(".chart").selectAll("circle")
+  svg.selectAll("circle")
     .data(data)
     .exit()
     .remove();
 }
 
 // Scatterplot
-function drawScatterPlot(chart_config, whichData, data) {
+function drawScatterPlot(wrapperObj, data) {
   // Remove existing svg if any
   //d3.select("svg").remove();
 
-  var svg = d3.select("#" + whichData)
+  var svg = d3.select("#" + wrapperObj.whichData + "_" + wrapperObj.device_id)
     .append("svg")
-    .attr("width", svgWidth)
-    .attr("height", svgHeight);
+    .attr("preserveAspectRatio", "xMinYMin meet")
+    .attr("viewBox", "0 0 " + svgWidth + " " + svgHeight)
+    //class to make it responsive
+    .classed("svg-content-responsive", true);
 
   var chart = svg.append("g")
     .attr("class", "chart")
@@ -490,7 +549,7 @@ function drawScatterPlot(chart_config, whichData, data) {
     .attr("cy", (d, i) => y(d.data_point))
     .attr("fill", (d) => {
       // if beyond threshold, change data point's color to red
-      return (d.data_point >= chart_config.threshold) ? red : blue;
+      return (d.data_point >= wrapperObj.chart_config.threshold) ? red : blue;
     })
     // Tooltip mouseover
     .on("mouseover", function(d) {
@@ -511,7 +570,10 @@ function drawScatterPlot(chart_config, whichData, data) {
 }
 
 // Update Scatterplot
-function updateScatterPlot(data) {
+function updateScatterPlot(wrapperObj, data) {
+  console.log("Updating scatterplot on " + wrapperObj.device_name
+    + "-" + wrapperObj.whichData);
+
   // Scale the x and y axis again
   var x = d3.scaleTime()
     .domain(d3.extent(data, function(d) { return d.ts }))
@@ -532,28 +594,32 @@ function updateScatterPlot(data) {
     .tickSize(8)
     .tickPadding(5);
 
-  var svg = d3.select("svg").transition();
+  var svg =
+    d3.select("#" + wrapperObj.whichData + "_" + wrapperObj.device_id)
+      .select("svg");
 
     // Update the x-axis
   svg.select(".x-axis")
+    .transition()
     .duration(transitionDuration)
     .call(xAxis);
 
   // Update the y-axis
   svg.select(".y-axis")
+    .transition()
     .duration(transitionDuration)
     .call(yAxis);
 
   /** Update Circle **/
   // Update existing data points
-  d3.select(".chart").selectAll("circle").data(data)
+  svg.select(".chart").selectAll("circle").data(data)
     .attr("class", "dotPoint")
     .attr("r", 4)
     .attr("cx", (d, i) => x(d.ts))
     .attr("cy", (d, i) => y(d.data_point))
     .attr("fill", (d) => {
       // if beyond threshold, change data point's color to red
-      return (d.data_point >= chart_config.threshold) ? red : blue;
+      return (d.data_point >= wrapperObj.chart_config.threshold) ? red : blue;
     })
     .transition()
     .duration(transitionDuration);
@@ -565,7 +631,7 @@ function updateScatterPlot(data) {
     .style("opacity", 0);
 
   // Create new data points, if there is new data
-  d3.select(".chart").selectAll("circle").data(data)
+  svg.select(".chart").selectAll("circle").data(data)
     .enter()
     .append("circle")
     .attr("class", "dotPoint")
@@ -574,7 +640,7 @@ function updateScatterPlot(data) {
     .attr("cy", (d, i) => y(d.data_point))
     .attr("fill", (d) => {
       // if beyond threshold, change data point's color to red
-      return (d.data_point >= chart_config.threshold) ? red : blue;
+      return (d.data_point >= wrapperObj.chart_config.threshold) ? red : blue;
     })
     .on("mouseover", function(d) {
       div.transition()
@@ -593,7 +659,7 @@ function updateScatterPlot(data) {
     });
 
   // Remove old data points
-  d3.select(".chart").selectAll("circle")
+  svg.select(".chart").selectAll("circle")
     .data(data)
     .exit()
     .remove();

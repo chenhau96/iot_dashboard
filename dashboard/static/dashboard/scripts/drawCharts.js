@@ -9,7 +9,7 @@ var transitionDuration = 1000; // 1000ms
 var red = "#e60000", blue = "#000066";  // color hex code
 
 // Chart width and height setting
-var svgWidth = 650, svgHeight = 400;
+var svgWidth = 650, svgHeight = 350;
 var margin = { top: 20, right: 20, bottom: 50, left: 80 };
 var width = svgWidth - margin.left - margin.right;
 var height = svgHeight - margin.top - margin.bottom;
@@ -127,8 +127,10 @@ function drawLineChart(data) {
   // Set svg width and height
   var svg = d3.select("#chart-content")
     .append("svg")
-    .attr("width", svgWidth)
-    .attr("height", svgHeight);
+    .attr("preserveAspectRatio", "xMinYMin meet")
+    .attr("viewBox", "0 0 " + svgWidth + " " + svgHeight)
+    //class to make it responsive
+    .classed("svg-content-responsive", true);
 
   // Set the chart position within the svg
   var g = svg.append("g")
@@ -361,8 +363,10 @@ function drawScatterPlot(data) {
 
   var svg = d3.select("#chart-content")
     .append("svg")
-    .attr("width", svgWidth)
-    .attr("height", svgHeight);
+    .attr("preserveAspectRatio", "xMinYMin meet")
+    .attr("viewBox", "0 0 " + svgWidth + " " + svgHeight)
+    //class to make it responsive
+    .classed("svg-content-responsive", true);
 
   var chart = svg.append("g")
     .attr("class", "chart")
