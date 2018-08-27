@@ -1,12 +1,17 @@
 
 var parsedData;
 var chartTitle = "";
-var ttFormatTime = d3.timeFormat("%d-%m-%Y %X");
-var iconCels = "\u2103";  // Celsius icon
 var updateFlag = false;
+var iconCels = "\u2103";  // Celsius icon
 var updateInterval = 30000; // 30s
 var transitionDuration = 1000; // 1000ms
-var red = "#e60000", blue = "#000066";  // color hex code
+var red = "#e60000", blue = "#0044cc";  // color hex code
+
+// Time formatting
+var ttFormatTime = d3.timeFormat("%d-%m-%Y %X");
+var dateFormatTime = d3.timeFormat("%Y-%m-%d");
+var nestedFormatTime = d3.timeFormat("%d-%m-%Y");
+var barChartFormatTime = d3.timeFormat("%d-%m");
 
 // Chart width and height setting
 var svgWidth = 650, svgHeight = 350;
@@ -54,7 +59,7 @@ function fetchDataFromAPI(api) {
       }
       else {
         parsedData = parseData(apiData);
-
+        console.log(parsedData);
         if (!updateFlag) {
           // First display of chart
           updateFlag = true;
@@ -98,6 +103,9 @@ function parseData(apiData) {
 // Function to process which chart type to draw
 function drawWhichChart(chart_type, data) {
   switch(chart_type) {
+    case 'barchart':
+      drawBarChart(data);
+      break;
     case 'scatterplot':
       drawScatterPlot(data);
       break;
@@ -110,6 +118,9 @@ function drawWhichChart(chart_type, data) {
 // Function to process which chart type to draw
 function updateWhichChart(chart_type, data) {
   switch(chart_type) {
+    case 'barchart':
+      updateBarChart(data);
+      break;
     case 'scatterplot':
       updateScatterPlot(data);
       break;
@@ -158,8 +169,8 @@ function drawLineChart(data) {
   // define y-axis
   var yAxis = d3.axisLeft(y)
     .ticks(5)
-    .tickSize(8)
-    .tickPadding(5);
+    .tickSize(-width)
+    .tickPadding(10);
 
   // d3's line generator
   var line = d3.line()
@@ -181,7 +192,7 @@ function drawLineChart(data) {
 
   // append y-axis and label in a group tag
   g.append("g")
-    .attr("class", "y-axis")
+    .attr("class", "y-axis grid")
     .call(yAxis)
     .append("text")
     .attr("class", "text-label")
@@ -259,8 +270,8 @@ function updateLineChart(data) {
 
   var yAxis = d3.axisLeft(y)
     .ticks(5)
-    .tickSize(8)
-    .tickPadding(5);
+    .tickSize(-width)
+    .tickPadding(10);
 
   // Generate the line
   var line = d3.line()
@@ -391,8 +402,8 @@ function drawScatterPlot(data) {
   // define y-axis
   var yAxis = d3.axisLeft(y)
     .ticks(5)
-    .tickSize(8)
-    .tickPadding(5);
+    .tickSize(-width)
+    .tickPadding(10);
 
     // append x-axis and label in a group tag
   chart.append("g")
@@ -408,7 +419,7 @@ function drawScatterPlot(data) {
 
   // append y-axis and label in a group tag
   chart.append("g")
-    .attr("class", "y-axis")
+    .attr("class", "y-axis grid")
     .call(yAxis)
     .append("text")
     .attr("class", "text-label")
@@ -438,7 +449,7 @@ function drawScatterPlot(data) {
     .attr("cy", (d, i) => y(d.data_point))
     .attr("fill", (d) => {
       // if beyond threshold, change data point's color to red
-      return (d.data_point >= chart_config.threshold) ? red : blue;
+      return (d.data_point >= chart_config.threshold) ? red : chart_config.color;
     })
     // Tooltip mouseover
     .on("mouseover", function(d) {
@@ -477,8 +488,8 @@ function updateScatterPlot(data) {
 
   var yAxis = d3.axisLeft(y)
     .ticks(5)
-    .tickSize(8)
-    .tickPadding(5);
+    .tickSize(-width)
+    .tickPadding(10);
 
   var svg = d3.select("svg").transition();
 
@@ -501,7 +512,7 @@ function updateScatterPlot(data) {
     .attr("cy", (d, i) => y(d.data_point))
     .attr("fill", (d) => {
       // if beyond threshold, change data point's color to red
-      return (d.data_point >= chart_config.threshold) ? red : blue;
+      return (d.data_point >= chart_config.threshold) ? red : chart_config.color;
     })
     .transition()
     .duration(transitionDuration);
@@ -522,7 +533,7 @@ function updateScatterPlot(data) {
     .attr("cy", (d, i) => y(d.data_point))
     .attr("fill", (d) => {
       // if beyond threshold, change data point's color to red
-      return (d.data_point >= chart_config.threshold) ? red : blue;
+      return (d.data_point >= chart_config.threshold) ? red : chart_config.color;
     })
     .on("mouseover", function(d) {
       div.transition()
@@ -545,6 +556,247 @@ function updateScatterPlot(data) {
     .data(data)
     .exit()
     .remove();
+}
+
+// Bar Chart
+function drawBarChart(data) {
+  // Remove existing svg if any
+  d3.select("svg").remove();
+
+  // Aggregate data with same date and calc the mean
+  var dataArray = getMeanDataOnDailyBasis(data);
+  parsedData = dataArray;
+
+  var svg = d3.select("#chart-content")
+    .append("svg")
+    .attr("preserveAspectRatio", "xMinYMin meet")
+    .attr("viewBox", "0 0 " + svgWidth + " " + svgHeight)
+    //class to make it responsive
+    .classed("svg-content-responsive", true);
+
+  var chart = svg.append("g")
+    .attr("class", "chart")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  // scale the range of x-axis
+  var x = d3.scaleBand()
+    .domain(dataArray.map(function(d) { return d.ts; }))
+    .range([0, width])
+    .padding(0.3);
+
+  // scale the range of y-axis
+  var y = d3.scaleLinear()
+    .domain(d3.extent(dataArray, function(d) { return d.data_point }))
+    .range([height, 0]);
+
+  // define x-axis
+  var xAxis = d3.axisBottom(x)
+    .tickSize(8)   // length of the each tick
+    .tickFormat(barChartFormatTime)
+    .tickPadding(5);
+
+  // Define x-axis ticks values if the timeline selected is
+  // either 'thisMonth' or 'thisYear' since the ticks auto generated
+  // will be too many and causes overlapping.
+  var barChartTicks = [];
+  var curSelectedTimeline = document.getElementById("timeline").value;
+  if (curSelectedTimeline == "thisMonth" || curSelectedTimeline == "thisYear") {
+    for(var i in dataArray) {
+      if (i % 3 == 0)
+        barChartTicks.push(dataArray[i].ts);
+    }
+    xAxis.tickValues(barChartTicks);
+  }
+
+  // define y-axis
+  var yAxis = d3.axisLeft(y)
+    .ticks(5)
+    .tickSize(-width)
+    .tickPadding(10);
+
+  // append x-axis and label in a group tag
+  chart.append("g")
+    .attr("class", "x-axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis)
+    .append("text")
+    .attr("class", "text-label")
+    .attr("fill", "#000")
+    .attr("transform", "translate(" + width_mid + ", " + 40 + ")")
+    .attr("text-anchor", "middle")
+    .text("Timeline");
+
+  // append y-axis and label in a group tag
+  chart.append("g")
+    .attr("class", "y-axis grid")
+    .call(yAxis)
+    .append("text")
+    .attr("class", "text-label")
+    .attr("fill", "#000")
+    .attr("x", 60 - height_mid)
+    .attr("y", 30 - margin.left)
+    .attr("transform", "rotate(-90)")
+    .attr("text-anchor", "end")
+    .text(() => {
+      if (chartTitle == "Temperature")
+        chartTitle += " " + iconCels;
+      return chartTitle;
+    });
+
+  // Add tooltip
+  var div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("display", "none")
+    .style("opacity", 0);
+
+  // add data points to the line
+  chart.selectAll("rect").data(dataArray).enter()
+    .append("rect")
+    .attr("class", "bar")
+    .attr("x", (d, i) => x(d.ts))
+    .attr("y", (d, i) => y(d.data_point))
+    .attr("width", x.bandwidth())
+    .attr("height", function(d) { return height - y(d.data_point); })
+    .attr("fill", (d) => {
+      // if beyond threshold, change data point's color to red
+      return (d.data_point >= chart_config.threshold) ? red : chart_config.color;
+    })
+    // Tooltip mouseover
+    .on("mouseover", function(d) {
+      div.transition()
+        .duration(200)
+        .style("display", "inline")
+        .style("opacity", .9);
+      div.html(nestedFormatTime(d.ts) + "<br/>" +
+        "<b>Avg: " + d.data_point.toFixed(2) + "</b>")
+          .style("left", (d3.event.pageX) + "px")
+          .style("top", (d3.event.pageY - 28) + "px");
+      })
+    .on("mouseout", function(d) {
+      div.transition()
+        .duration(500)
+        .style("opacity", 0);
+    });
+}
+
+// Update Bar Chart
+function updateBarChart(data) {
+  var dataArray = getMeanDataOnDailyBasis(data);
+  parsedData = dataArray;
+
+  // scale the range of x-axis
+  var x = d3.scaleBand()
+    .domain(dataArray.map(function(d) { return d.ts; }))
+    .range([0, width])
+    .padding(0.3);
+
+  // scale the range of y-axis
+  var y = d3.scaleLinear()
+    .domain(d3.extent(dataArray, function(d) { return d.data_point }))
+    .range([height, 0]);
+
+  // define x-axis
+  var xAxis = d3.axisBottom(x)
+    .tickSize(8)   // length of the each tick
+    .tickFormat(barChartFormatTime)
+    .tickPadding(5);
+
+  // Define x-axis ticks values if the timeline selected is
+  // either 'thisMonth' or 'thisYear' since the ticks auto generated
+  // will be too many and causes overlapping.
+  var barChartTicks = [];
+  var curSelectedTimeline = document.getElementById("timeline").value;
+  if (curSelectedTimeline == "thisMonth" || curSelectedTimeline == "thisYear") {
+    for(var i in dataArray) {
+      if (i % 3 == 0)
+        barChartTicks.push(dataArray[i].ts);
+    }
+    xAxis.tickValues(barChartTicks);
+  }
+
+  // define y-axis
+  var yAxis = d3.axisLeft(y)
+    .ticks(5)
+    .tickSize(-width)
+    .tickPadding(10);
+
+  var svg = d3.select("svg").transition();
+
+  // Update the x-axis
+  svg.select(".x-axis")
+    .duration(transitionDuration)
+    .call(xAxis);
+
+  // Update the y-axis
+  svg.select(".y-axis")
+    .duration(transitionDuration)
+    .call(yAxis);
+
+  // Add tooltip
+  var div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("display", "none")
+    .style("opacity", 0);
+
+  // Remove old data points
+  var bars = d3.select(".chart").selectAll("rect")
+    .remove()
+    .exit()
+    .data(dataArray);
+
+  // Add new data points to the chart
+  bars.enter()
+    .append("rect")
+    .attr("class", "bar")
+    .attr("x", (d, i) => x(d.ts))
+    .attr("y", (d, i) => y(d.data_point))
+    .attr("width", x.bandwidth())
+    .attr("height", function(d) { return height - y(d.data_point); })
+    .attr("fill", (d) => {
+      // if beyond threshold, change data point's color to red
+      return (d.data_point >= chart_config.threshold) ? red : chart_config.color;
+    })
+    // Tooltip mouseover
+    .on("mouseover", function(d) {
+      div.transition()
+        .duration(200)
+        .style("display", "inline")
+        .style("opacity", .9);
+      div.html(nestedFormatTime(d.ts) + "<br/>" +
+        "<b>Avg: " + d.data_point.toFixed(2) + "</b>")
+          .style("left", (d3.event.pageX) + "px")
+          .style("top", (d3.event.pageY - 28) + "px");
+      })
+    .on("mouseout", function(d) {
+      div.transition()
+        .duration(500)
+        .style("opacity", 0);
+    });
+}
+
+// Aggregate data and find mean
+function getMeanDataOnDailyBasis(data) {
+  // Aggregate data with same date and calc the mean
+  var nestedData = d3.nest()
+    .key(function(d) { return dateFormatTime(d.ts); })
+    .rollup(function(d) {
+      return d3.mean(d, function(g) {return g.data_point; });
+    }).entries(data);
+
+  // Convert nested data into array
+  var dataArray = [];
+  for (var i = 0; i < nestedData.length; i++) {
+    var dateString = nestedData[i].key + "T00:00:00Z";
+    console.log(dateString);
+    dataArray.push(
+      {
+        ts: new Date(dateString),
+        data_point: nestedData[i].value,
+      }
+    );
+  }
+
+  return dataArray;
 }
 
 
@@ -571,12 +823,29 @@ function changeThreshold(e) {
   chart_config.threshold = e.target.value;
   console.log("New threshold value: " + e.target.value);
 
-  d3.selectAll("circle").data(parsedData)
-    .attr("fill", (d) => {
-      return (d.data_point >= chart_config.threshold) ? red : blue;
-    })
-    .transition()
-    .duration(transitionDuration);
+  var selectedChart = document.getElementById("chart_type").value;
+
+  switch(selectedChart) {
+    case 'linechart':
+    case 'scatterplot':
+      d3.selectAll("circle").data(parsedData)
+        .attr("fill", (d) => {
+          return (d.data_point >= chart_config.threshold) ? red : chart_config.color;
+        })
+        .transition()
+        .duration(transitionDuration);
+      break;
+    case 'barchart':
+      d3.selectAll("rect").data(parsedData)
+        .attr("fill", (d) => {
+          // if beyond threshold, change data point's color to red
+          return (d.data_point >= chart_config.threshold) ? red : chart_config.color;
+        })
+        .transition()
+        .duration(transitionDuration);
+      break;
+  }
+
 }
 
 // Change Color Function
@@ -585,8 +854,32 @@ function changeColor(e) {
   chart_config.color = e.target.value;
   console.log("New color value: " + e.target.value);
 
-  // Change the color of the line
-  d3.select(".line").attr("stroke", chart_config.color);
+  var selectedChart = document.getElementById("chart_type").value;
+
+  switch(selectedChart) {
+    case 'linechart':
+      // Change the color of the line
+      d3.select(".line").attr("stroke", chart_config.color);
+      break;
+    case 'scatterplot':
+      d3.selectAll("circle").data(parsedData)
+        .attr("fill", (d) => {
+          return (d.data_point >= chart_config.threshold) ? red : chart_config.color;
+        })
+        .transition()
+        .duration(transitionDuration);
+      break;
+    case 'barchart':
+      d3.selectAll("rect").data(parsedData)
+        .attr("fill", (d) => {
+          // if beyond threshold, change data point's color to red
+          return (d.data_point >= chart_config.threshold) ? red : chart_config.color;
+        })
+        .transition()
+        .duration(transitionDuration);
+      break;
+  }
+
 }
 
 // Change Chart Type Function

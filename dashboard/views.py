@@ -34,8 +34,10 @@ def device_dashboard(request, dev_id):
         raise Http404("Device ID \"" + dev_id + "\" does not exist")
     else:
         device_data = Devices.objects(device_id=dev_id).first()
-        data_keys = device_data.data.keys()
-        print("Data keys: ", data_keys)
+        data_keys = {}
+        if device_data:
+            data_keys = device_data.data.keys()
+            print("Data keys: ", data_keys)
 
         # if device_id is found, render the page
         return render(request, 'dashboard/device_dashboard.html',

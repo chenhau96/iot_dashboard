@@ -4,9 +4,31 @@
 
 {% block content %}
 <script src="{% static 'dashboard/scripts/index.js' %}"></script>
+<script>
+    var map;
+    function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: 3.041803, lng: 101.793075},
+          zoom: 8
+        });
+    }
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDYvdwRZapQ9T_RlYbDD2Uhi5nJPOOZL50&callback=initMap"
+    async defer></script>
 
 <div class="container-fluid">
     <div id="device-charts"></div>
+
+    <div class="row">
+        <div class="col-md-7">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h6 class="chart-title">Map</h6>
+                </div>
+                <div id="map"></div>
+            </div>
+        </div>
+    </div>
 </div>
 
 

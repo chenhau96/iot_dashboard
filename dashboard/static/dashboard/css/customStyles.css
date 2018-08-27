@@ -22,10 +22,15 @@
 
 /** Style the title link in each of the card header **/
 .card-header > a {
-  color: blue;
+  color: #4B4545;
 }
 
 /* mouse over link */
 .card-header > a:hover {
   text-decoration: underline;
+}
+
+#map {
+  height: 35%;
+  width: 100%;
 }

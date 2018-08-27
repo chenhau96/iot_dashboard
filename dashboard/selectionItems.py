@@ -6,7 +6,7 @@ colorList = [
 ]
 
 chartTypeList = [
-    # "bar chart",
+    "bar chart",
     # "histogram",
     "line chart",
     # "pie chart",
