@@ -4,6 +4,9 @@ from . import views
 
 app_name = 'dashboard'
 urlpatterns = [
+    # Login Page
+    path('login', views.login, name='login'),
+
     # Dashboard Main Page
     path('', views.index, name='index'),
 

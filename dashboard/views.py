@@ -11,6 +11,10 @@ from rest_framework_mongoengine import viewsets
 from dashboard.serializers import DevicesSerializer, DeviceConfigSerializer
 
 
+def login(request):
+    return render(request, 'dashboard/login.html')
+
+
 def index(request):
     """
     Main dashboard

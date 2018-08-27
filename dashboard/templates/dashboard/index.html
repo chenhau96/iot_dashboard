@@ -11,6 +11,20 @@
           center: {lat: 3.041803, lng: 101.793075},
           zoom: 8
         });
+
+        var locations = [
+            ['LoRa device', 3.041803, 101.793075],
+            ['Device 2', 20.7587, 79.19283744],
+            ['Device 3', 10.7587, 57.1234],
+        ];
+
+        for (count = 0; count < locations.length; count++) {
+            marker = new google.maps.Marker({
+                position: new google.maps.LatLng(locations[count][1], locations[count][2]),
+                map: map,
+                title: locations[count][0]
+            });
+        }
     }
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDYvdwRZapQ9T_RlYbDD2Uhi5nJPOOZL50&callback=initMap"
